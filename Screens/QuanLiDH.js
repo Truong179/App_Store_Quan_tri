@@ -14,9 +14,9 @@ const QuanLiDH = () => {
     <Tab.Navigator
       initialRouteName='DonHang'
       screenOptions={{
-        tabBarActiveTintColor: Colors.green,
+        tabBarActiveTintColor: Colors.black,
         tabBarStyle: { backgroundColor: Colors.wwhite },
-        tabBarInactiveTintColor: Colors.black,
+        tabBarInactiveTintColor: Colors.gray,
 
 
 

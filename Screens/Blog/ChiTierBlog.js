@@ -1,14 +1,14 @@
 import { StyleSheet, Text, View } from 'react-native'
 import React from 'react'
 
-const QuanLiBlog = () => {
+const ChiTierBlog = () => {
   return (
     <View>
-      <Text>QuanLiBlog</Text>
+      <Text>ChiTierBlog</Text>
     </View>
   )
 }
 
-export default QuanLiBlog
+export default ChiTierBlog
 
 const styles = StyleSheet.create({})

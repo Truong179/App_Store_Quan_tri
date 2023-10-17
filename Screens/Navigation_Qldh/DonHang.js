@@ -76,7 +76,7 @@ const DonHang = () => {
                 <View style={{ alignItems: 'flex-end', margin: 10 }}>
                     <TouchableOpacity
                         style={{
-                            backgroundColor: Colors.green,
+                            backgroundColor: Colors.black,
                             borderRadius: 5,
                             height: 38,
                             alignItems: 'center',
@@ -107,7 +107,7 @@ const DonHang = () => {
             }}>
                 <TouchableOpacity
                     style={{
-                        backgroundColor: Colors.green,
+                        backgroundColor: Colors.black,
                         borderRadius: 5,
                         height: 38,
                         alignItems: 'center',
