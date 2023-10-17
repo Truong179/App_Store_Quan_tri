@@ -2,8 +2,10 @@ import { StyleSheet, Text, View, Image, FlatList } from 'react-native'
 import React from 'react'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { TouchableOpacity } from 'react-native'
+import { useNavigation } from '@react-navigation/native'
 
 const Home = () => {
+    const nav = useNavigation()
     const listFunctions = [
         {
             name: "Sản phẩm",
@@ -12,7 +14,7 @@ const Home = () => {
         },
         {
             name: "Đơn hàng",
-            image: require("../../Image/order.png"),
+            image: require("../../Image/order_menu.png"),
             color: "blue"
         },
         {
@@ -58,7 +60,11 @@ const Home = () => {
                         <Image style={{
                             width: 20, height: 20, tintColor: "gray"
                         }} source={require("../../Image/statistical.png")} />
-                        <TouchableOpacity style={
+                        <TouchableOpacity 
+                         onPress={() =>{
+                            nav.navigate("Thống kê")
+                         }}
+                        style={
                             {
                                 flexDirection: "row", marginTop: 5,
                                 justifyContent: "center",
