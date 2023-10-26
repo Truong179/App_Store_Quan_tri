@@ -26,7 +26,6 @@ const InformationAcount = (props) => {
 
             <TouchableOpacity 
                 style={{ backgroundColor: Colors.wwhite, width: 330, height: 55, marginTop: 50, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', padding: 10, borderRadius: 10 }}
-                onPress={()=>{nav.navigate('DoiMK')}}
                 >
                 <Text style={{ fontWeight: 'bold', fontSize: 16, }}>Đổi mật khẩu</Text>
                 <Image style={{ height: 20, width: 20 }} source={require("../../Image/next.png")} />
