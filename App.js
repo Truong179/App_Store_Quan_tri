@@ -17,6 +17,8 @@ import ChangePassword from './Screens/ChangePassword';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import InformationAcount from './Screens/ManagerAcount/informationAcount';
 import QuanLiBlog from './Screens/Blog/QuanLiBlog';
+import DoiMK from './Screens/ManagerAcount/DoiMK';
+import InfoShop from './Screens/ManagerAcount/InfoShop';
 const Drawer = createDrawerNavigator();
 const Stack = createNativeStackNavigator();
 
@@ -25,6 +27,10 @@ function ManagerAcountNav() {
     <Stack.Navigator initialRouteName='QuanLiTK'>
       <Stack.Screen name='QuanLiTK' component={QuanLiTK} options={{headerShown:false}} />
       <Stack.Screen name='InformationAcount' component={InformationAcount} options={{}}/>
+      <Stack.Screen name='DoiMK' component={DoiMK} options={{}}/>
+      <Stack.Screen name='InfoShop' component={InfoShop} options={{}}/>
+
+
     </Stack.Navigator>
   )
 }
@@ -51,7 +57,7 @@ function App() {
           }} />
         <Drawer.Screen name="Quản lí dơn hàng" component={QuanLiDH}
           options={{
-            headerShown: false,
+            // headerShown: false,
             drawerActiveBackgroundColor: "#D3D3D3",
             drawerActiveTintColor: "black",
             drawerIcon: ({ focused, size }) => (
@@ -61,7 +67,7 @@ function App() {
         />
         <Drawer.Screen name="Quản lí blog" component={QuanLiBlog}
           options={{
-            headerShown: false,
+            // headerShown: false,
             drawerActiveBackgroundColor: "#D3D3D3",
             drawerActiveTintColor: "black",
             drawerIcon: ({ focused, size }) => (
@@ -71,7 +77,7 @@ function App() {
         />
         <Drawer.Screen name="Nhắn tin" component={NhanTin}
           options={{
-            headerShown: false,
+            // headerShown: false,
             drawerActiveBackgroundColor: "#D3D3D3",
             drawerActiveTintColor: "black",
             drawerIcon: ({ focused, size }) => (
