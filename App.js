@@ -35,6 +35,14 @@ function ManagerAcountNav() {
   )
 }
 
+=======
+import ListProduct from './Screens/ManagerProduct/listProduct';
+import AddProduct from './Screens/ManagerProduct/addProduct';
+import Login from './Screens/Login/Login';
+const Drawer = createDrawerNavigator();
+const Stack = createNativeStackNavigator();
+
+>>>>>>> Stashed changes
 function App() {
   const [isLogin, setIsLogin] = useState(false)
 
