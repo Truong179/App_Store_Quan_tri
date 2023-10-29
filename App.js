@@ -9,7 +9,6 @@ import ThongKe from './Screens/Stats/ThongKe';
 import QuanLiTK from './Screens/ManagerAcount/QuanLiTK';
 import Home from './Screens/Home/home';
 import { Image } from 'react-native'
-import React from 'react'
 import React, { useState } from 'react'
 import CustomDrawerHeder from './compoment/headerDrawer';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -18,31 +17,12 @@ import ChangePassword from './Screens/ChangePassword';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import InformationAcount from './Screens/ManagerAcount/informationAcount';
 import QuanLiBlog from './Screens/Blog/QuanLiBlog';
-<<<<<<< Updated upstream
-import InfoShop from './Screens/ManagerAcount/InfoShop';
-const Drawer = createDrawerNavigator();
-const Stack = createNativeStackNavigator();
-
-function ManagerAcountNav() {
-  return (
-    <Stack.Navigator initialRouteName='QuanLiTK'>
-      <Stack.Screen name='QuanLiTK' component={QuanLiTK} options={{headerShown:false}} />
-      <Stack.Screen name='InformationAcount' component={InformationAcount} options={{}}/>
-      <Stack.Screen name='InfoShop' component={InfoShop} options={{}}/>
-
-
-    </Stack.Navigator>
-  )
-}
-
-=======
 import ListProduct from './Screens/ManagerProduct/listProduct';
 import AddProduct from './Screens/ManagerProduct/addProduct';
 import Login from './Screens/Login/Login';
 const Drawer = createDrawerNavigator();
 const Stack = createNativeStackNavigator();
 
->>>>>>> Stashed changes
 function App() {
   const [isLogin, setIsLogin] = useState(false)
 
@@ -142,7 +122,6 @@ function App() {
             )
           }}
         />
-        <Drawer.Screen name="Quản lí tài khoản" component={ManagerAcountNav} 
         <Drawer.Screen name="Quản lí tài khoản" component={ManagerAcountNav}
 
           options={{
