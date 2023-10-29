@@ -20,6 +20,7 @@ import QuanLiBlog from './Screens/Blog/QuanLiBlog';
 import ListProduct from './Screens/ManagerProduct/listProduct';
 import AddProduct from './Screens/ManagerProduct/addProduct';
 import Login from './Screens/Login/Login';
+import InfoShop from './Screens/ManagerAcount/InfoShop';
 const Drawer = createDrawerNavigator();
 const Stack = createNativeStackNavigator();
 
@@ -31,6 +32,7 @@ function App() {
       <Stack.Navigator initialRouteName='QuanLiTK'>
         <Stack.Screen name='QuanLiTK' component={QuanLiTK} options={{ headerShown: false }} />
         <Stack.Screen name='InformationAcount' component={InformationAcount} options={{}} />
+        <Stack.Screen name='InfoShop' component={InfoShop} options={{}} />
       </Stack.Navigator>
     )
   }
