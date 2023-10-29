@@ -10,6 +10,7 @@ import QuanLiTK from './Screens/ManagerAcount/QuanLiTK';
 import Home from './Screens/Home/home';
 import { Image } from 'react-native'
 import React from 'react'
+import React, { useState } from 'react'
 import CustomDrawerHeder from './compoment/headerDrawer';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { View } from 'react-native';
@@ -17,6 +18,7 @@ import ChangePassword from './Screens/ChangePassword';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import InformationAcount from './Screens/ManagerAcount/informationAcount';
 import QuanLiBlog from './Screens/Blog/QuanLiBlog';
+<<<<<<< Updated upstream
 import InfoShop from './Screens/ManagerAcount/InfoShop';
 const Drawer = createDrawerNavigator();
 const Stack = createNativeStackNavigator();
@@ -34,8 +36,28 @@ function ManagerAcountNav() {
 }
 
 function App() {
-  return (
-    <NavigationContainer>
+  const [isLogin, setIsLogin] = useState(false)
+
+  function ManagerAcountNav() {
+    return (
+      <Stack.Navigator initialRouteName='QuanLiTK'>
+        <Stack.Screen name='QuanLiTK' component={QuanLiTK} options={{ headerShown: false }} />
+        <Stack.Screen name='InformationAcount' component={InformationAcount} options={{}} />
+      </Stack.Navigator>
+    )
+  }
+
+  function ManagerProductNav() {
+    return (
+      <Stack.Navigator>
+        <Stack.Screen name='ListProduct' component={ListProduct} options={{ title: "Quản lý sản phẩm" }} />
+        <Stack.Screen name='AddProduct' component={AddProduct} options={{ title: "Thêm sản phẩm" }} />
+      </Stack.Navigator>
+    )
+  }
+
+  const DrawerNavigator = () => {
+    return (
       <Drawer.Navigator
         drawerContent={(props) =>
           <SafeAreaView>
@@ -60,6 +82,17 @@ function App() {
             drawerActiveTintColor: "black",
             drawerIcon: ({ focused, size }) => (
               <Image source={focused ? require('./Image/order_focus.png') : require('./Image/order.png')} style={{ height: size, width: size, }} />
+            )
+          }}
+        />
+        <Drawer.Screen name="ManagerProductNav" component={ManagerProductNav}
+          options={{
+            title: "Quản lý sản phẩm",
+            headerShown: false,
+            drawerActiveBackgroundColor: "#D3D3D3",
+            drawerActiveTintColor: "black",
+            drawerIcon: ({ focused, size }) => (
+              <Image source={focused ? require('./Image/managerProduct_focus.png') : require('./Image/managerProduct.png')} style={{ height: size, width: size, }} />
             )
           }}
         />
@@ -102,6 +135,7 @@ function App() {
           }}
         />
         <Drawer.Screen name="Quản lí tài khoản" component={ManagerAcountNav} 
+        <Drawer.Screen name="Quản lí tài khoản" component={ManagerAcountNav}
 
           options={{
             // headerShown:false,
@@ -114,8 +148,22 @@ function App() {
         />
 
       </Drawer.Navigator>
-    </NavigationContainer>
+    )
+  }
 
+  const LoginNavigator = () => {
+    return (
+      <Stack.Navigator>
+        <Stack.Screen name='Login' options={{headerShown:false}}>
+          {(props) => <Login {...props} setIsLogin={setIsLogin} />}
+        </Stack.Screen>
+      </Stack.Navigator>
+    )
+  }
+  return (
+    <NavigationContainer>
+      {isLogin ? <DrawerNavigator /> : <LoginNavigator />}
+    </NavigationContainer>
   );
 }
 export default App;
