@@ -14,16 +14,16 @@ import { Dropdown } from "react-native-element-dropdown";
 import { API_Product } from "../../API/getAPI";
 import axios from "axios";
 
-const AddProduct = ({ navigation, route }) => {
-  const { dataType } = route.params;
+const EditProduct = ({ navigation, route }) => {
+  const { dataType, item } = route.params;
   const [isFocus, setIsFocus] = useState(false);
 
-  const [name, setName] = useState("");
-  const [image, setImage] = useState(null);
-  const [price, setPrice] = useState(0);
-  const [disription, setDisription] = useState("");
-  const [quantity, setQuantity] = useState(0);
-  const [value, setValue] = useState(null);
+  const [name, setName] = useState(item.name);
+  const [image, setImage] = useState({ uri: item.image });
+  const [price, setPrice] = useState(item.price.toString());
+  const [disription, setDisription] = useState(item.description);
+  const [quantity, setQuantity] = useState(item.quantity.toString());
+  const [value, setValue] = useState(item.id_type._id);
 
   const pickImageAsync = async () => {
     let result = await ImagePicker.launchImageLibraryAsync({
@@ -35,8 +35,8 @@ const AddProduct = ({ navigation, route }) => {
     }
   };
 
-  // Post api
-  const postApi = async () => {
+  // Put api
+  const putApi = async () => {
     // Kiểm tra dữ liệu trống
     if (!name || !image || !price || !disription || !quantity || !value) {
       ToastAndroid.showWithGravity(
@@ -49,10 +49,10 @@ const AddProduct = ({ navigation, route }) => {
     // Khai báo FormData
     let formData = new FormData();
     formData.append("name", name);
-    formData.append("price", price);
-    formData.append("description", disription);
-    formData.append("quantity", quantity);
-    formData.append("id_type", value);
+    // formData.append("price", price);
+    // formData.append("description", disription);
+    // formData.append("quantity", quantity);
+    // formData.append("id_type", value);
 
     let localUri = image.uri;
     let filename = localUri.split("/").pop();
@@ -61,20 +61,20 @@ const AddProduct = ({ navigation, route }) => {
     formData.append("image", { uri: image.uri, name: filename, type });
 
     try {
-      await axios.post(API_Product, formData, {
+      await axios.put(API_Product + item._id, formData, {
         headers: {
           "Content-Type": "multipart/form-data",
         },
       });
 
       ToastAndroid.showWithGravity(
-        "Thêm sản phẩm thành công",
+        "Sửa sản phẩm thành công",
         ToastAndroid.LONG,
         ToastAndroid.BOTTOM
       );
       navigation.replace("ListProduct");
     } catch (error) {
-      console.log("Post api: " + error.message);
+      console.log("Put api: " + error.message);
     }
   };
 
@@ -92,19 +92,15 @@ const AddProduct = ({ navigation, route }) => {
           }}
           onPress={() => pickImageAsync()}
         >
-          {image ? (
-            <Image
-              style={{
-                width: 80,
-                height: 80,
-                resizeMode: "contain",
-                borderRadius: 10,
-              }}
-              source={{ uri: image.uri }}
-            />
-          ) : (
-            <Text style={{ color: "white" }}>Thêm ảnh</Text>
-          )}
+          <Image
+            style={{
+              width: 80,
+              height: 80,
+              resizeMode: "contain",
+              borderRadius: 10,
+            }}
+            source={{ uri: image.uri }}
+          />
         </TouchableOpacity>
       </View>
 
@@ -132,9 +128,8 @@ const AddProduct = ({ navigation, route }) => {
           </View>
           <TextInput
             maxLength={120}
-            onChangeText={(text) => {
-              setName(text);
-            }}
+            value={name}
+            onChangeText={setName}
             style={{
               marginTop: 4,
             }}
@@ -164,9 +159,8 @@ const AddProduct = ({ navigation, route }) => {
           </View>
           <TextInput
             maxLength={3000}
-            onChangeText={(text) => {
-              setDisription(text);
-            }}
+            value={disription}
+            onChangeText={setDisription}
             style={{
               marginTop: 4,
             }}
@@ -209,6 +203,7 @@ const AddProduct = ({ navigation, route }) => {
                 data={dataType}
                 labelField="name"
                 valueField="_id"
+                value={value}
                 onFocus={() => setIsFocus(true)}
                 onBlur={() => setIsFocus(false)}
                 maxHeight={150}
@@ -232,10 +227,9 @@ const AddProduct = ({ navigation, route }) => {
           >
             <Text>Giá bán</Text>
             <TextInput
+              value={price}
               keyboardType="numeric"
-              onChangeText={(text) => {
-                setPrice(text);
-              }}
+              onChangeText={setPrice}
               placeholder="Nhập giá"
             />
           </View>
@@ -252,15 +246,14 @@ const AddProduct = ({ navigation, route }) => {
           >
             <Text>Số lượng</Text>
             <TextInput
+              value={quantity}
               keyboardType="numeric"
-              onChangeText={(text) => {
-                setQuantity(text);
-              }}
+              onChangeText={setQuantity}
               placeholder="Số lượng sản phẩm"
             />
           </View>
 
-          <TouchableOpacity style={styles.btn} onPress={() => postApi()}>
+          <TouchableOpacity style={styles.btn} onPress={() => putApi()}>
             <Text style={{ color: "white" }}>Xác nhận</Text>
           </TouchableOpacity>
         </View>
@@ -269,7 +262,7 @@ const AddProduct = ({ navigation, route }) => {
   );
 };
 
-export default AddProduct;
+export default EditProduct;
 
 const styles = StyleSheet.create({
   container: {

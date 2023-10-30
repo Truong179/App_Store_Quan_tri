@@ -21,6 +21,7 @@ import InformationAcount from "./Screens/ManagerAcount/informationAcount";
 import QuanLiBlog from "./Screens/Blog/QuanLiBlog";
 import ListProduct from "./Screens/ManagerProduct/listProduct";
 import AddProduct from "./Screens/ManagerProduct/addProduct";
+import EditProduct from "./Screens/ManagerProduct/EditProduct";
 import Login from "./Screens/Login/Login";
 import InfoShop from "./Screens/ManagerAcount/InfoShop";
 
@@ -40,6 +41,11 @@ function App() {
           component={AddProduct}
           options={{ title: "Thêm sản phẩm" }}
         />
+        <Stack.Screen
+          name="EditProduct"
+          component={EditProduct}
+          options={{ title: "Sửa sản phẩm" }}
+        />
       </Stack.Navigator>
     );
   }
@@ -55,7 +61,7 @@ function App() {
         <Stack.Screen
           name="InformationAcount"
           component={InformationAcount}
-          options={{ title: "Thông tin shop" }}
+          options={{ title: "Thông tin tài khoản" }}
         />
         <Stack.Screen
           name="InfoShop"
@@ -99,7 +105,6 @@ function App() {
           name="Quản lí dơn hàng"
           component={QuanLiDH}
           options={{
-            // headerShown: false,
             drawerActiveBackgroundColor: "#D3D3D3",
             drawerActiveTintColor: "black",
             drawerIcon: ({ focused, size }) => (
@@ -119,7 +124,7 @@ function App() {
           component={ManagerProductNav}
           options={{
             title: "Quản lý sản phẩm",
-            // headerShown: false,
+
             drawerActiveBackgroundColor: "#D3D3D3",
             drawerActiveTintColor: "black",
             drawerIcon: ({ focused, size }) => (
@@ -138,7 +143,6 @@ function App() {
           name="Quản lí blog"
           component={QuanLiBlog}
           options={{
-            // headerShown: false,
             drawerActiveBackgroundColor: "#D3D3D3",
             drawerActiveTintColor: "black",
             drawerIcon: ({ focused, size }) => (
@@ -157,7 +161,6 @@ function App() {
           name="Nhắn tin"
           component={NhanTin}
           options={{
-            // headerShown: false,
             drawerActiveBackgroundColor: "#D3D3D3",
             drawerActiveTintColor: "black",
             drawerIcon: ({ focused, size }) => (
@@ -212,7 +215,6 @@ function App() {
           name="Quản lí tài khoản"
           component={ManagerAcountNav}
           options={{
-            // headerShown:false,
             drawerActiveBackgroundColor: "#D3D3D3",
             drawerActiveTintColor: "black",
             drawerIcon: ({ focused, size }) => (

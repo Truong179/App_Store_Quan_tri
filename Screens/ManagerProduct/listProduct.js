@@ -1,79 +1,76 @@
-import { Button, FlatList, Image, StyleSheet, Text, View } from "react-native";
-import React, { useState } from "react";
-import { TouchableOpacity } from "react-native";
-import { useNavigation } from "@react-navigation/native";
+import {
+  FlatList,
+  Image,
+  RefreshControl,
+  ScrollView,
+  StyleSheet,
+  Text,
+  View,
+  TouchableOpacity,
+  Pressable,
+} from "react-native";
+import React, { useCallback, useEffect, useState } from "react";
+import axios from "axios";
+import { API_Product, API_Type_Product } from "../../API/getAPI";
 
-const ListProduct = () => {
-  const nav = useNavigation();
-  const listTypeProduct = [
-    {
-      id: 1,
-      name: "IPhone",
-      image:
-        "https://th.bing.com/th/id/OIP.JA6loYnkXxgyOW12hFS9iAHaDx?w=302&h=178&c=7&r=0&o=5&dpr=1.7&pid=1.7",
-    },
-    {
-      id: 2,
-      name: "IPad",
-      image:
-        "https://th.bing.com/th/id/OIP.DfNYxqCvB_2XQP3ecK1I5wHaE8?w=228&h=180&c=7&r=0&o=5&dpr=1.7&pid=1.7",
-    },
-    {
-      id: 3,
-      name: "Smart Watch",
-      image:
-        "https://th.bing.com/th/id/OIP.kiELBb9ik5UeDYVmXvLqrAHaE8?w=238&h=180&c=7&r=0&o=5&dpr=1.7&pid=1.7",
-    },
-    {
-      id: 4,
-      name: "Macbook",
-      image:
-        "https://th.bing.com/th/id/OIP.cfYGoQ82IC-c6sGUtgZjTwHaE-?w=253&h=180&c=7&r=0&o=5&dpr=1.7&pid=1.7",
-    },
-    {
-      id: 5,
-      name: "AirPods",
-      image:
-        "https://th.bing.com/th/id/OIP.AjlXl1wqvoul19TuTGi2HAHaER?w=289&h=180&c=7&r=0&o=5&dpr=1.7&pid=1.7",
-    },
-  ];
-
-  const listProduct = [
-    {
-      id: 1,
-      name: "IPhone 15, 1T Microphone TiTan",
-      image:
-        "https://images.fpt.shop/unsafe/fit-in/214x214/filters:quality(90):fill(white)/fptshop.com.vn/Uploads/Originals/2023/9/14/638302786719525352_ip-15-pro-max-dd.jpg",
-      idType: 1,
-      price: 25000000,
-    },
-    {
-      id: 2,
-      name: "IPhone 14 Pro Max",
-      image:
-        "https://images.fpt.shop/unsafe/fit-in/214x214/filters:quality(90):fill(white)/fptshop.com.vn/Uploads/Originals/2023/1/31/638107858631679725_iphone-14-pro-max-dd-1.jpg",
-      idType: 1,
-      price: 16000000,
-    },
-    {
-      id: 3,
-      name: "IPhone 11 64GB",
-      image:
-        "https://images.fpt.shop/unsafe/fit-in/214x214/filters:quality(90):fill(white)/fptshop.com.vn/Uploads/Originals/2023/4/17/638173197260604063_iphone-11-dd.jpg",
-      idType: 1,
-      price: 10000000,
-    },
-  ];
-
-  const [showBtn, setShowBtn] = useState(false);
-  const [dataType, setDataType] = useState(listTypeProduct);
-  const [dataProduct, setProduct] = useState(listProduct);
+const ListProduct = ({ navigation }) => {
+  const [dataType, setDataType] = useState([]);
+  const [dataProduct, setProduct] = useState([]);
+  const [refreshing, setRefreshing] = useState(false);
+  const [selectedCategory, setSelectedCategory] = useState("Macbook");
 
   const formatPrice = (price) => {
     return Intl.NumberFormat("vi-VN").format(price);
   };
 
-  const handleShowBtn = () => {};
+  // Call api
+  const getApi = async () => {
+    try {
+      const res1 = await axios.get(API_Product);
+      setProduct(res1.data.message);
+      const res2 = await axios.get(API_Type_Product);
+      setDataType(res2.data.message);
+    } catch (error) {
+      console.log("Call api: " + error.message);
+    }
+  };
+
+  const putHidden = async (item) => {
+    // Khai báo FormData
+    let formData = new FormData();
+
+    let localUri = item.image;
+    let filename = localUri.split("/").pop();
+    let match = /\.(\w+)$/.exec(filename);
+    let type = match ? `image/${match[1]}` : `image`;
+    formData.append("image", { uri: item.image, name: filename, type });
+    formData.append("hidden", !item.hidden);
+
+    try {
+      await axios.put(API_Product + item._id, formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
+      getApi();
+    } catch (error) {
+      console.log("Put api: " + error.message);
+    }
+  };
+
+  // Load lại khi kéo xuống
+  const onRefresh = useCallback(() => {
+    setRefreshing(true);
+    setTimeout(() => {
+      getApi();
+      setRefreshing(false);
+    }, 2000);
+  }, []);
+
+  useEffect(() => {
+    getApi();
+  }, []);
+
   return (
     <View style={styles.container}>
       <View style={styles.headerType}>
@@ -81,11 +78,13 @@ const ListProduct = () => {
           horizontal={true}
           showsHorizontalScrollIndicator={false}
           data={dataType}
-          onEndReached={handleShowBtn}
-          keyExtractor={(item) => item.id}
+          keyExtractor={(key) => key._id}
           renderItem={({ item }) => {
             return (
-              <TouchableOpacity style={styles.typeProduct}>
+              <TouchableOpacity
+                style={styles.typeProduct}
+                onPress={() => setSelectedCategory(item.name)}
+              >
                 <Image
                   style={{
                     width: "100%",
@@ -111,50 +110,74 @@ const ListProduct = () => {
             );
           }}
         />
-        {showBtn && <Button title="Them san pham" />}
       </View>
 
-      <View style={styles.content}>
+      <ScrollView
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+        }
+        contentContainerStyle={styles.content}
+      >
         <FlatList
-          data={dataProduct}
+          scrollEnabled={false}
+          data={dataProduct[selectedCategory]}
           numColumns={2}
-          keyExtractor={(item) => item.id}
+          columnWrapperStyle={{
+            marginVertical: "1.5%",
+            justifyContent: "space-around",
+          }}
+          keyExtractor={(key) => key._id}
           renderItem={({ item }) => {
             return (
-              <TouchableOpacity style={styles.btnProduct}>
+              <Pressable
+                style={styles.btnProduct}
+                onPress={() => {
+                  navigation.navigate("EditProduct", {
+                    item: item,
+                    dataType: dataType,
+                  });
+                }}
+              >
                 <Image
                   resizeMode="stretch"
                   style={{
-                    width: "70%",
-                    height: "55%",
+                    width: "95%",
+                    height: "65%",
+                    borderRadius: 10,
                     alignSelf: "center",
                   }}
                   source={{ uri: item.image }}
                 />
                 <View
                   style={{
-                    width: "100%",
                     borderTopWidth: 1,
-                    marginTop: 10,
+                    marginTop: "4%",
                     borderColor: "gray",
-                    paddingTop: 6,
                   }}
                 >
                   <Text
-                    numberOfLines={2}
+                    numberOfLines={1}
                     style={{
                       fontWeight: "bold",
-                      fontSize: 12,
+                      fontSize: 14,
                     }}
                   >
                     {item.name}
                   </Text>
+                  <Text
+                    style={{
+                      fontWeight: "bold",
+                      fontSize: 12,
+                    }}
+                    numberOfLines={2}
+                  >
+                    Còn: {item.quantity}
+                  </Text>
                   <View
                     style={{
                       flexDirection: "row",
-                      position: "absolute",
                       width: "100%",
-                      top: 50,
+                      marginTop: "4%",
                       alignItems: "center",
                       justifyContent: "space-between",
                     }}
@@ -166,25 +189,31 @@ const ListProduct = () => {
                     >
                       {formatPrice(item.price)}đ
                     </Text>
-                    <TouchableOpacity>
+
+                    <TouchableOpacity onPress={() => putHidden(item)}>
                       <Image
                         style={{
                           width: 25,
                           height: 25,
+                          resizeMode: "contain",
                         }}
-                        source={require("../../Image/hidden.png")}
+                        source={
+                          item.hidden
+                            ? require("../../Image/hidden.png")
+                            : require("../../Image/hidden2.png")
+                        }
                       />
                     </TouchableOpacity>
                   </View>
                 </View>
-              </TouchableOpacity>
+              </Pressable>
             );
           }}
         />
-      </View>
-      <TouchableOpacity
+      </ScrollView>
+      <Pressable
         onPress={() => {
-          nav.navigate("AddProduct", { dataType });
+          navigation.navigate("AddProduct", { dataType: dataType });
         }}
         style={{
           width: 60,
@@ -206,7 +235,7 @@ const ListProduct = () => {
           }}
           source={require("../../Image/addProduct.png")}
         />
-      </TouchableOpacity>
+      </Pressable>
     </View>
   );
 };
@@ -218,11 +247,11 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   headerType: {
+    marginTop: "1%",
     width: "100%",
-    height: "18%",
+    height: "13%",
     backgroundColor: "white",
-    paddingHorizontal: 10,
-    flexDirection: "row",
+    paddingHorizontal: "1%",
   },
   typeProduct: {
     width: 150,
@@ -231,18 +260,11 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     alignSelf: "center",
   },
-  content: {
-    flex: 1,
-    paddingHorizontal: 20,
-    marginTop: 10,
-  },
   btnProduct: {
-    width: "45%",
-    height: 200,
+    width: "47%",
+    height: 230,
     backgroundColor: "white",
-    marginVertical: 10,
-    marginRight: 25,
-    padding: 10,
+    padding: "2%",
     borderRadius: 10,
   },
 });

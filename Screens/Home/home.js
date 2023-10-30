@@ -12,21 +12,25 @@ import { SafeAreaView } from "react-native-safe-area-context";
 const listFunctions = [
   {
     name: "Sản phẩm",
+    screen: "ManagerProductNav",
     image: require("../../Image/product.png"),
     color: "green",
   },
   {
     name: "Đơn hàng",
+    screen: "Quản lí dơn hàng",
     image: require("../../Image/order_menu.png"),
     color: "blue",
   },
   {
     name: "Giảm giá",
+    screen: null,
     image: require("../../Image/discount.png"),
     color: "red",
   },
   {
     name: "Xem thêm",
+    screen: null,
     image: require("../../Image/see_more.png"),
     color: "gray",
   },
@@ -145,7 +149,10 @@ const Home = ({ navigation }) => {
           keyExtractor={(item) => item.name}
           renderItem={({ item }) => {
             return (
-              <TouchableOpacity style={{ alignItems: "center" }}>
+              <TouchableOpacity
+                style={{ alignItems: "center" }}
+                onPress={() => navigation.navigate(item.screen)}
+              >
                 <View
                   style={{
                     width: 60,
@@ -202,6 +209,11 @@ const Home = ({ navigation }) => {
             paddingBottom: 15,
             borderColor: "gray",
           }}
+          onPress={() =>
+            navigation.navigate("Quản lí dơn hàng", {
+              screen: "DonHang",
+            })
+          }
         >
           <View style={{ flexDirection: "row", alignItems: "center" }}>
             <Image
@@ -227,6 +239,11 @@ const Home = ({ navigation }) => {
             paddingBottom: 15,
             borderColor: "gray",
           }}
+          onPress={() =>
+            navigation.navigate("Quản lí dơn hàng", {
+              screen: "DangGiao",
+            })
+          }
         >
           <View style={{ flexDirection: "row", alignItems: "center" }}>
             <Image
@@ -249,6 +266,11 @@ const Home = ({ navigation }) => {
             marginTop: 15,
             justifyContent: "space-between",
           }}
+          onPress={() =>
+            navigation.navigate("Quản lí dơn hàng", {
+              screen: "DaGiao",
+            })
+          }
         >
           <View style={{ flexDirection: "row", alignItems: "center" }}>
             <Image
