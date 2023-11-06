@@ -1,3 +1,4 @@
+import React, { useCallback, useEffect, useState } from "react";
 import {
   FlatList,
   Image,
@@ -9,7 +10,6 @@ import {
   TouchableOpacity,
   Pressable,
 } from "react-native";
-import React, { useCallback, useEffect, useState } from "react";
 import axios from "axios";
 import { API_Product, API_Type_Product } from "../../API/getAPI";
 
@@ -23,20 +23,20 @@ const ListProduct = ({ navigation }) => {
     return Intl.NumberFormat("vi-VN").format(price);
   };
 
-  // Call api
   const getApi = async () => {
+    setRefreshing(true);
     try {
-      const res1 = await axios.get(API_Product);
+      const res1 = await axios.get(API_Product, { params: { role: "Shop" } });
       setProduct(res1.data.message);
       const res2 = await axios.get(API_Type_Product);
       setDataType(res2.data.message);
+      setRefreshing(false);
     } catch (error) {
       console.log("Call api: " + error.message);
     }
   };
 
   const putHidden = async (item) => {
-    // Khai báo FormData
     let formData = new FormData();
 
     let localUri = item.image;
@@ -47,7 +47,7 @@ const ListProduct = ({ navigation }) => {
     formData.append("hidden", !item.hidden);
 
     try {
-      await axios.put(API_Product + item._id, formData, {
+      await axios.put(`${API_Product}${item._id}`, formData, {
         headers: {
           "Content-Type": "multipart/form-data",
         },
@@ -58,13 +58,8 @@ const ListProduct = ({ navigation }) => {
     }
   };
 
-  // Load lại khi kéo xuống
   const onRefresh = useCallback(() => {
-    setRefreshing(true);
-    setTimeout(() => {
-      getApi();
-      setRefreshing(false);
-    }, 2000);
+    getApi();
   }, []);
 
   useEffect(() => {
@@ -86,26 +81,10 @@ const ListProduct = ({ navigation }) => {
                 onPress={() => setSelectedCategory(item.name)}
               >
                 <Image
-                  style={{
-                    width: "100%",
-                    height: "100%",
-                    borderRadius: 10,
-                  }}
+                  style={styles.typeProductImage}
                   source={{ uri: item.image }}
                 />
-                <Text
-                  style={{
-                    position: "absolute",
-                    fontSize: 20,
-                    color: "white",
-                    fontWeight: "bold",
-                    bottom: 10,
-                    left: 10,
-                    elevation: 3,
-                  }}
-                >
-                  {item.name}
-                </Text>
+                <Text style={styles.typeProductName}>{item.name}</Text>
               </TouchableOpacity>
             );
           }}
@@ -116,16 +95,12 @@ const ListProduct = ({ navigation }) => {
         refreshControl={
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
         }
-        contentContainerStyle={styles.content}
+        contentContainerStyle={styles.container}
       >
         <FlatList
           scrollEnabled={false}
           data={dataProduct[selectedCategory]}
           numColumns={2}
-          columnWrapperStyle={{
-            marginVertical: "1.5%",
-            justifyContent: "space-around",
-          }}
           keyExtractor={(key) => key._id}
           renderItem={({ item }) => {
             return (
@@ -139,68 +114,27 @@ const ListProduct = ({ navigation }) => {
                 }}
               >
                 <Image
-                  resizeMode="stretch"
-                  style={{
-                    width: "95%",
-                    height: "65%",
-                    borderRadius: 10,
-                    alignSelf: "center",
-                  }}
+                  style={styles.productImage}
                   source={{ uri: item.image }}
                 />
-                <View
-                  style={{
-                    borderTopWidth: 1,
-                    marginTop: "4%",
-                    borderColor: "gray",
-                  }}
-                >
-                  <Text
-                    numberOfLines={1}
-                    style={{
-                      fontWeight: "bold",
-                      fontSize: 14,
-                    }}
-                  >
+                <View style={styles.productInfoContainer}>
+                  <Text style={styles.productName} numberOfLines={1}>
                     {item.name}
                   </Text>
-                  <Text
-                    style={{
-                      fontWeight: "bold",
-                      fontSize: 12,
-                    }}
-                    numberOfLines={2}
-                  >
+                  <Text style={styles.productQuantity} numberOfLines={2}>
                     Còn: {item.quantity}
                   </Text>
-                  <View
-                    style={{
-                      flexDirection: "row",
-                      width: "100%",
-                      marginTop: "4%",
-                      alignItems: "center",
-                      justifyContent: "space-between",
-                    }}
-                  >
-                    <Text
-                      style={{
-                        fontWeight: "bold",
-                      }}
-                    >
+                  <View style={styles.productPriceContainer}>
+                    <Text style={styles.productPrice}>
                       {formatPrice(item.price)}đ
                     </Text>
-
                     <TouchableOpacity onPress={() => putHidden(item)}>
                       <Image
-                        style={{
-                          width: 25,
-                          height: 25,
-                          resizeMode: "contain",
-                        }}
+                        style={styles.hiddenIcon}
                         source={
                           item.hidden
-                            ? require("../../Image/hidden.png")
-                            : require("../../Image/hidden2.png")
+                            ? require("../../Image/hidden2.png")
+                            : require("../../Image/hidden.png")
                         }
                       />
                     </TouchableOpacity>
@@ -211,36 +145,21 @@ const ListProduct = ({ navigation }) => {
           }}
         />
       </ScrollView>
+
       <Pressable
         onPress={() => {
           navigation.navigate("AddProduct", { dataType: dataType });
         }}
-        style={{
-          width: 60,
-          height: 60,
-          borderRadius: 30,
-          backgroundColor: "black",
-          justifyContent: "center",
-          alignItems: "center",
-          position: "absolute",
-          right: 20,
-          bottom: 20,
-        }}
+        style={styles.addButton}
       >
         <Image
-          style={{
-            width: 30,
-            height: 30,
-            tintColor: "white",
-          }}
+          style={styles.addIcon}
           source={require("../../Image/addProduct.png")}
         />
       </Pressable>
     </View>
   );
 };
-
-export default ListProduct;
 
 const styles = StyleSheet.create({
   container: {
@@ -260,11 +179,78 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     alignSelf: "center",
   },
+  typeProductImage: {
+    width: "100%",
+    height: "100%",
+    borderRadius: 10,
+  },
+  typeProductName: {
+    position: "absolute",
+    fontSize: 20,
+    color: "white",
+    fontWeight: "bold",
+    bottom: 10,
+    left: 10,
+    elevation: 3,
+  },
   btnProduct: {
     width: "47%",
     height: 230,
     backgroundColor: "white",
     padding: "2%",
+    margin: "1%",
     borderRadius: 10,
   },
+  productImage: {
+    width: "95%",
+    height: "65%",
+    borderRadius: 10,
+    alignSelf: "center",
+  },
+  productInfoContainer: {
+    borderTopWidth: 1,
+    marginTop: "4%",
+    borderColor: "gray",
+  },
+  productName: {
+    fontWeight: "bold",
+    fontSize: 14,
+  },
+  productQuantity: {
+    fontWeight: "bold",
+    fontSize: 12,
+  },
+  productPriceContainer: {
+    flexDirection: "row",
+    width: "100%",
+    marginTop: "4%",
+    alignItems: "center",
+    justifyContent: "space-between",
+  },
+  productPrice: {
+    fontWeight: "bold",
+  },
+  hiddenIcon: {
+    width: 25,
+    height: 25,
+    resizeMode: "contain",
+  },
+  addButton: {
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    backgroundColor: "black",
+    justifyContent: "center",
+    alignItems: "center",
+    position: "absolute",
+    right: 20,
+    bottom: 20,
+  },
+  addIcon: {
+    width: 30,
+    height: 30,
+    tintColor: "white",
+  },
 });
+
+export default ListProduct;

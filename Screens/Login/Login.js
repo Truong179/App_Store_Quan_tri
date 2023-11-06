@@ -9,6 +9,7 @@ import React, { useState } from "react";
 import { validataPassWord } from "../../compoment/validate";
 import { API_User } from "../../API/getAPI";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import axios from "axios";
 
 const Login = (props) => {
   const [userName, setUserName] = useState("");
@@ -17,32 +18,24 @@ const Login = (props) => {
   const [errorPassword, setErrorPassword] = useState("");
   const [error, setError] = useState("");
 
-  const validateLogin = () => {
-    // Demo qua màn
-    props.setIsLogin(true);
-
-    if (userName !== "" && passWord !== "") {
-      if (errorPassword === "" && errorUserName === "") {
-        fetch(API_User + "/signIn", {
-          method: "POST",
-          body: JSON.stringify({ userName, passWord, role: "Shop" }),
-          headers: {
-            "Content-Type": "application/json",
-          },
-        })
-          .then((repose) => repose.json())
-          .then((data) => {
-            if (data.error) {
-              setError(data.error);
-            } else {
-              AsyncStorage.setItem("user", JSON.stringify(data));
-              setError("");
-              props.setIsLogin(true);
-            }
-          });
-      }
-    } else {
+  const validateLogin = async () => {
+    if (!userName || !passWord) {
       setError("Vui lòng nhập đầy đủ thông tin");
+      return;
+    }
+
+    try {
+      const res = await axios.post(API_User + "/signIn", {
+        userName,
+        passWord,
+        role: "Shop",
+      });
+      AsyncStorage.setItem("user", res.data);
+      setError("");
+      console.log(res.data);
+      props.setIsLogin(true);
+    } catch (error) {
+      console.error("Post api:" + error.message);
     }
   };
 

@@ -1,89 +1,44 @@
-import { StyleSheet, Text, View, Image, TouchableOpacity } from "react-native";
 import React from "react";
+import { StyleSheet, Text, View, Image, TouchableOpacity } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 
 const QuanLiTK = () => {
   const nav = useNavigation();
+
+  const navigateTo = (screen) => {
+    nav.navigate(screen);
+  };
+
   return (
     <View style={styles.container}>
       <View style={styles.content}>
         <TouchableOpacity
-          onPress={() => {
-            nav.navigate("InformationAcount");
-          }}
+          onPress={() => navigateTo("InformationAcount")}
           style={styles.informationAcount}
         >
-          <Image
-            style={{
-              width: 25,
-              height: 25,
-            }}
-            source={require("../../Image/user.png")}
-          />
-          <Text
-            style={{
-              fontSize: 17,
-              marginLeft: 10,
-            }}
-          >
-            Thông tin tài khoản
-          </Text>
+          <Image style={styles.icon} source={require("../../Image/user.png")} />
+          <Text style={styles.label}>Thông tin tài khoản</Text>
         </TouchableOpacity>
+
         <TouchableOpacity
+          onPress={() => navigateTo("InfoShop")}
           style={styles.informationAcount}
-          onPress={() => {
-            nav.navigate("InfoShop");
-          }}
         >
-          <Image
-            style={{
-              width: 25,
-              height: 25,
-            }}
-            source={require("../../Image/shop.png")}
-          />
-          <Text
-            style={{
-              fontSize: 17,
-              marginLeft: 10,
-            }}
-          >
-            Thông tin Shop
-          </Text>
+          <Image style={styles.icon} source={require("../../Image/shop.png")} />
+          <Text style={styles.label}>Thông tin Shop</Text>
         </TouchableOpacity>
+
         <TouchableOpacity style={styles.informationAcount}>
-          <Image
-            style={{
-              width: 25,
-              height: 25,
-            }}
-            source={require("../../Image/pay.png")}
-          />
-          <Text
-            style={{
-              fontSize: 17,
-              marginLeft: 10,
-            }}
-          >
-            Rút tiền
-          </Text>
+          <Image style={styles.icon} source={require("../../Image/pay.png")} />
+          <Text style={styles.label}>Rút tiền</Text>
         </TouchableOpacity>
+
         <TouchableOpacity style={styles.information2}>
           <Image
-            style={{
-              width: 25,
-              height: 25,
-            }}
+            style={styles.icon}
             source={require("../../Image/address.png")}
           />
-          <Text
-            style={{
-              fontSize: 17,
-              marginLeft: 10,
-            }}
-          >
-            Địa chỉ Shop
-          </Text>
+          <Text style={styles.label}>Địa chỉ Shop</Text>
         </TouchableOpacity>
       </View>
 
@@ -120,6 +75,14 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     paddingTop: 15,
     borderColor: "gray",
+  },
+  icon: {
+    width: 25,
+    height: 25,
+  },
+  label: {
+    fontSize: 17,
+    marginLeft: 10,
   },
   logOut: {
     width: "100%",

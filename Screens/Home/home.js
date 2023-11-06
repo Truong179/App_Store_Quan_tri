@@ -1,3 +1,4 @@
+import React, { useState, useEffect } from "react";
 import {
   StyleSheet,
   Text,
@@ -5,9 +6,12 @@ import {
   Image,
   FlatList,
   TouchableOpacity,
+  ScrollView,
+  RefreshControl,
 } from "react-native";
-import React from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { API_User } from "../../API/getAPI";
+import axios from "axios";
 
 const listFunctions = [
   {
@@ -22,277 +26,166 @@ const listFunctions = [
     image: require("../../Image/order_menu.png"),
     color: "blue",
   },
-  {
-    name: "Giảm giá",
-    screen: null,
-    image: require("../../Image/discount.png"),
-    color: "red",
-  },
-  {
-    name: "Xem thêm",
-    screen: null,
-    image: require("../../Image/see_more.png"),
-    color: "gray",
-  },
 ];
 
 const Home = ({ navigation }) => {
+  const [refreshing, setRefreshing] = useState(false);
+  const [synthetic, setSynthetic] = useState([]);
+
+  useEffect(() => {
+    fetchData();
+  }, []);
+
+  const fetchData = async () => {
+    setRefreshing(true);
+    try {
+      const res = await axios.get(`${API_User}synthetic`);
+      setSynthetic(res.data.message);
+      setRefreshing(false);
+    } catch (error) {
+      console.error("Call API: " + error.message);
+    }
+  };
+
+  const FunctionItem = ({ item, onPress }) => (
+    <TouchableOpacity style={styles.functionItem} onPress={onPress}>
+      <View
+        style={[styles.functionIconContainer, { backgroundColor: item.color }]}
+      >
+        <Image style={styles.functionIcon} source={item.image} />
+      </View>
+      <Text style={styles.functionName}>{item.name}</Text>
+    </TouchableOpacity>
+  );
+
+  const OrderStatusItem = ({ status, count, onPress }) => (
+    <TouchableOpacity style={styles.orderStatusItem} onPress={onPress}>
+      <View style={styles.orderStatusIconContainer}>
+        <Image style={styles.orderStatusIcon} source={status.image} />
+        <Text style={styles.orderStatusText}>{status.label}</Text>
+      </View>
+      <View style={styles.orderStatusTextContainer}>
+        <Text style={styles.orderStatusCount}>{count}</Text>
+        <Image
+          style={styles.orderStatusIcon}
+          source={require("../../Image/next.png")}
+        />
+      </View>
+    </TouchableOpacity>
+  );
+
+  const renderFunctionItem = ({ item }) => (
+    <FunctionItem
+      item={item}
+      onPress={() => navigation.navigate(item.screen)}
+    />
+  );
+
+  const renderOrderStatusItem = (status, count, screen) => (
+    <OrderStatusItem
+      status={status}
+      count={count}
+      onPress={() =>
+        navigation.navigate("Quản lí dơn hàng", {
+          screen,
+        })
+      }
+    />
+  );
+
   return (
     <SafeAreaView style={styles.container}>
-      <View style={styles.header}>
-        <View
-          style={{
-            flexDirection: "row",
-            alignItems: "center",
-          }}
-        >
-          <Image
-            style={styles.avatar}
-            source={require("../../Image/logo.png")}
+      <ScrollView
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={() => fetchData()}
           />
-          <Text style={styles.textLogo}>IStore</Text>
-        </View>
-        <Image
-          style={{ width: 30, height: 30 }}
-          source={require("../../Image/notification.png")}
-        />
-      </View>
-      <View style={styles.statistical}>
-        <View style={styles.statisticalDay}>
-          <View style={{ alignItems: "center" }}>
-            <Text
-              style={{
-                fontSize: 18,
-              }}
-            >
-              Doanh thu ngày
-            </Text>
-            <Text
-              style={{
-                fontSize: 17,
-                fontWeight: "bold",
-              }}
-            >
-              2.500.000 Đ
-            </Text>
-          </View>
-          <View style={{ alignItems: "center", justifyContent: "center" }}>
+        }
+      >
+        <View style={styles.header}>
+          <View style={styles.logoContainer}>
             <Image
-              style={{
-                width: 20,
-                height: 20,
-                tintColor: "gray",
-              }}
-              source={require("../../Image/statistical.png")}
+              style={styles.logo}
+              source={require("../../Image/logo.png")}
             />
-            <TouchableOpacity
-              onPress={() => {
-                navigation.navigate("Thống kê");
-              }}
-              style={{
-                flexDirection: "row",
-                marginTop: 5,
-                justifyContent: "center",
-                alignItems: "center",
-              }}
-            >
-              <Text style={{ fontSize: 12, fontWeight: "bold" }}>
-                Xem chi tiết
+            <Text style={styles.logoText}>IStore</Text>
+          </View>
+          <Image
+            style={styles.notificationIcon}
+            source={require("../../Image/notification.png")}
+          />
+        </View>
+        <View style={styles.statistical}>
+          <View style={styles.statisticalDay}>
+            <View style={styles.statisticalItem}>
+              <Text style={styles.statisticalTitle}>Doanh thu</Text>
+              <Text style={styles.statisticalValue}>
+                {synthetic.dailyRevenue}
               </Text>
+            </View>
+            <View style={styles.statisticalItem}>
               <Image
-                style={{
-                  width: 17,
-                  height: 17,
-                }}
-                source={require("../../Image/next.png")}
+                style={styles.statisticalIcon}
+                source={require("../../Image/statistical.png")}
               />
-            </TouchableOpacity>
-          </View>
-        </View>
-        <View style={styles.statisticsOrder}>
-          <View
-            style={{
-              width: "50%",
-              justifyContent: "center",
-              alignItems: "center",
-              height: 68,
-              borderRightWidth: 0.5,
-              borderColor: "gray",
-            }}
-          >
-            <Text>Đơn hàng</Text>
-            <Text style={{ fontWeight: "bold" }}>5</Text>
-          </View>
-          <View
-            style={{
-              width: "50%",
-              justifyContent: "center",
-              alignItems: "center",
-              height: 68,
-            }}
-          >
-            <Text>Đơn hủy</Text>
-            <Text style={{ fontWeight: "bold" }}>3</Text>
-          </View>
-        </View>
-      </View>
-      {/*  */}
-      <View
-        style={{
-          height: 120,
-          alignItems: "center",
-        }}
-      >
-        <FlatList
-          data={listFunctions}
-          horizontal={true}
-          keyExtractor={(item) => item.name}
-          renderItem={({ item }) => {
-            return (
               <TouchableOpacity
-                style={{ alignItems: "center" }}
-                onPress={() => navigation.navigate(item.screen)}
+                onPress={() => {
+                  navigation.navigate("Thống kê");
+                }}
+                style={styles.statisticalDetails}
               >
-                <View
-                  style={{
-                    width: 60,
-                    height: 60,
-                    borderRadius: 30,
-                    backgroundColor: item.color,
-                    margin: 15,
-                    justifyContent: "center",
-                    alignItems: "center",
-                  }}
-                >
-                  <Image
-                    style={{
-                      width: 30,
-                      height: 30,
-                    }}
-                    source={item.image}
-                  />
-                </View>
-                <Text>{item.name}</Text>
+                <Text style={styles.statisticalDetailsText}>Xem chi tiết</Text>
+                <Image
+                  style={styles.statisticalDetailsIcon}
+                  source={require("../../Image/next.png")}
+                />
               </TouchableOpacity>
-            );
-          }}
-        />
-      </View>
+            </View>
+          </View>
+          <View style={styles.statisticsOrder}>
+            <View style={styles.orderCountItem}>
+              <Text>Đơn hàng</Text>
+              <Text style={styles.orderCount}>{synthetic.orderCount}</Text>
+            </View>
+            <View style={styles.orderCountItem}>
+              <Text>Đơn hủy</Text>
+              <Text style={styles.orderCount}>{synthetic.cancelCount}</Text>
+            </View>
+          </View>
+        </View>
+        <View style={styles.functionList}>
+          <FlatList
+            data={listFunctions}
+            horizontal={true}
+            keyExtractor={(item) => item.name}
+            renderItem={renderFunctionItem}
+          />
+        </View>
 
-      <Text
-        style={{
-          fontSize: 20,
-          fontWeight: "600",
-          marginTop: 10,
-        }}
-      >
-        Đơn hàng đang xử lý
-      </Text>
+        <Text style={styles.orderProcessingTitle}>Đơn hàng đang xử lý</Text>
 
-      <View
-        style={{
-          width: "100%",
-          height: 180,
-          borderRadius: 5,
-          marginTop: 20,
-          backgroundColor: "white",
-          elevation: 8,
-          padding: 10,
-        }}
-      >
-        <TouchableOpacity
-          style={{
-            flexDirection: "row",
-            marginTop: 10,
-            justifyContent: "space-between",
-            borderBottomWidth: 0.4,
-            paddingBottom: 15,
-            borderColor: "gray",
-          }}
-          onPress={() =>
-            navigation.navigate("Quản lí dơn hàng", {
-              screen: "DonHang",
-            })
-          }
-        >
-          <View style={{ flexDirection: "row", alignItems: "center" }}>
-            <Image
-              style={{ width: 25, height: 25 }}
-              source={require("../../Image/handle.png")}
-            />
-            <Text style={{ marginLeft: 15 }}>Chờ duyệt</Text>
-          </View>
-          <View style={{ flexDirection: "row", alignItems: "center" }}>
-            <Text style={{ marginLeft: 15, marginRight: 10 }}>3</Text>
-            <Image
-              style={{ width: 20, height: 20 }}
-              source={require("../../Image/next.png")}
-            />
-          </View>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={{
-            flexDirection: "row",
-            marginTop: 15,
-            justifyContent: "space-between",
-            borderBottomWidth: 0.4,
-            paddingBottom: 15,
-            borderColor: "gray",
-          }}
-          onPress={() =>
-            navigation.navigate("Quản lí dơn hàng", {
-              screen: "DangGiao",
-            })
-          }
-        >
-          <View style={{ flexDirection: "row", alignItems: "center" }}>
-            <Image
-              style={{ width: 25, height: 25 }}
-              source={require("../../Image/shiper.png")}
-            />
-            <Text style={{ marginLeft: 15 }}>Đang giao</Text>
-          </View>
-          <View style={{ flexDirection: "row", alignItems: "center" }}>
-            <Text style={{ marginLeft: 15, marginRight: 10 }}>2</Text>
-            <Image
-              style={{ width: 20, height: 20 }}
-              source={require("../../Image/next.png")}
-            />
-          </View>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={{
-            flexDirection: "row",
-            marginTop: 15,
-            justifyContent: "space-between",
-          }}
-          onPress={() =>
-            navigation.navigate("Quản lí dơn hàng", {
-              screen: "DaGiao",
-            })
-          }
-        >
-          <View style={{ flexDirection: "row", alignItems: "center" }}>
-            <Image
-              style={{ width: 25, height: 25 }}
-              source={require("../../Image/success.png")}
-            />
-            <Text style={{ marginLeft: 15 }}>Đã giao </Text>
-          </View>
-          <View style={{ flexDirection: "row", alignItems: "center" }}>
-            <Text style={{ marginLeft: 15, marginRight: 10 }}>1</Text>
-            <Image
-              style={{ width: 20, height: 20 }}
-              source={require("../../Image/next.png")}
-            />
-          </View>
-        </TouchableOpacity>
-      </View>
+        <View style={styles.orderProcessingContainer}>
+          {renderOrderStatusItem(
+            { label: "Chờ duyệt", image: require("../../Image/handle.png") },
+            synthetic?.orderStatusCounts?.orderStatusCounts["Đang vận chuyển"],
+            "DonHang"
+          )}
+          {renderOrderStatusItem(
+            { label: "Đang giao", image: require("../../Image/shiper.png") },
+            synthetic?.orderStatusCounts?.orderStatusCounts["Đang xử lý"],
+            "DangGiao"
+          )}
+          {renderOrderStatusItem(
+            { label: "Đã giao", image: require("../../Image/success.png") },
+            synthetic?.orderStatusCounts?.orderStatusCounts["Đã giao"],
+            "DaGiao"
+          )}
+        </View>
+      </ScrollView>
     </SafeAreaView>
   );
 };
-
-export default Home;
 
 const styles = StyleSheet.create({
   container: {
@@ -305,15 +198,23 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
   },
-  avatar: {
+  logoContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  logo: {
     width: 60,
     height: 60,
   },
-  textLogo: {
+  logoText: {
     fontWeight: "bold",
     fontSize: 20,
     position: "absolute",
     left: 55,
+  },
+  notificationIcon: {
+    width: 30,
+    height: 30,
   },
   statistical: {
     width: "100%",
@@ -331,8 +232,114 @@ const styles = StyleSheet.create({
     borderBottomWidth: 0.5,
     borderColor: "gray",
   },
+  statisticalItem: {
+    alignItems: "center",
+  },
+  statisticalTitle: {
+    fontSize: 18,
+  },
+  statisticalValue: {
+    fontSize: 17,
+    fontWeight: "bold",
+  },
+  statisticalIcon: {
+    width: 20,
+    height: 20,
+    tintColor: "gray",
+  },
+  statisticalDetails: {
+    flexDirection: "row",
+    marginTop: 5,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  statisticalDetailsText: {
+    fontSize: 12,
+    fontWeight: "bold",
+  },
+  statisticalDetailsIcon: {
+    width: 17,
+    height: 17,
+  },
   statisticsOrder: {
     flexDirection: "row",
   },
-  itemFunction: {},
+  orderCountItem: {
+    width: "50%",
+    justifyContent: "center",
+    alignItems: "center",
+    height: 68,
+    borderRightWidth: 0.5,
+    borderLeftWidth: 0.5,
+    borderColor: "gray",
+  },
+  orderCount: {
+    fontWeight: "bold",
+  },
+  functionList: {
+    height: 120,
+    alignItems: "center",
+  },
+  functionItem: {
+    alignItems: "center",
+  },
+  functionIconContainer: {
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    margin: 15,
+    borderRadius: 20,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  functionIcon: {
+    width: 30,
+    height: 30,
+  },
+  functionName: {
+    marginTop: 5,
+  },
+  orderProcessingTitle: {
+    fontSize: 20,
+    fontWeight: "600",
+    marginTop: 10,
+  },
+  orderProcessingContainer: {
+    width: "100%",
+    height: 180,
+    borderRadius: 5,
+    marginTop: 20,
+    backgroundColor: "white",
+    elevation: 8,
+    padding: 10,
+  },
+  orderStatusItem: {
+    flexDirection: "row",
+    marginTop: 10,
+    justifyContent: "space-between",
+    borderBottomWidth: 0.4,
+    paddingBottom: 15,
+    borderColor: "gray",
+  },
+  orderStatusIconContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  orderStatusIcon: {
+    width: 25,
+    height: 25,
+  },
+  orderStatusTextContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  orderStatusText: {
+    marginLeft: 15,
+  },
+  orderStatusCount: {
+    marginLeft: 10,
+    marginRight: 10,
+  },
 });
+
+export default Home;

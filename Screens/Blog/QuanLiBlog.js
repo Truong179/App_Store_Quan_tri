@@ -1,13 +1,14 @@
+import React, { useEffect, useState } from "react";
 import {
   Alert,
   FlatList,
   Image,
+  RefreshControl,
   Text,
   ToastAndroid,
   TouchableOpacity,
   View,
 } from "react-native";
-import React, { useEffect, useState } from "react";
 import Colors from "../../src/Colors";
 import EditBlog from "./EditBlog";
 import AddBlog from "./AddBlog";
@@ -15,19 +16,21 @@ import axios from "axios";
 import { API_Blog } from "../../API/getAPI";
 
 const QuanLiBlog = () => {
-  const [blog, setBlog] = useState([]);
+  const [refreshing, setRefreshing] = useState(false);
+  const [blogs, setBlogs] = useState([]);
 
-  // Call api
   const getApi = async () => {
+    setRefreshing(true);
     try {
-      const res = await axios.get(API_Blog);
-      setBlog(res.data.message);
+      const response = await axios.get(API_Blog);
+      setBlogs(response.data.message);
+      setRefreshing(false);
     } catch (error) {
-      console.log("Call api: " + error.message);
+      console.log("Call API: " + error.message);
     }
   };
 
-  // Delete api
+  // Delete API
   const deleteApi = (idBlog) => {
     Alert.alert(
       "Thông báo",
@@ -38,15 +41,10 @@ const QuanLiBlog = () => {
           onPress: async () => {
             try {
               await axios.delete(API_Blog + idBlog);
-              ToastAndroid.showWithGravity(
-                "Xóa blog thành công",
-                ToastAndroid.LONG,
-                ToastAndroid.BOTTOM
-              );
-              // Gọi lại api
+              ToastAndroid.show("Xóa blog thành công", ToastAndroid.SHORT);
               getApi();
             } catch (error) {
-              console.log("Call api: " + error.message);
+              console.log("Call API: " + error.message);
             }
           },
         },
@@ -61,18 +59,12 @@ const QuanLiBlog = () => {
   };
 
   useEffect(() => {
-    // Lấy blog
     getApi();
   }, []);
 
-  const item = ({ item }) => {
+  const renderItem = ({ item }) => {
     return (
-      <View
-        style={{
-          backgroundColor: Colors.grey,
-          marginTop: "2%",
-        }}
-      >
+      <View style={{ backgroundColor: Colors.grey, marginTop: "2%" }}>
         <View style={{ flexDirection: "row", margin: 10 }}>
           <View
             style={{
@@ -91,7 +83,6 @@ const QuanLiBlog = () => {
               source={{ uri: item.image }}
             />
           </View>
-
           <View style={{ width: "69%" }}>
             <Text
               style={{ fontSize: 18, fontWeight: "bold" }}
@@ -121,13 +112,17 @@ const QuanLiBlog = () => {
       </View>
     );
   };
+
   return (
     <View style={{ flex: 1, backgroundColor: Colors.wwhite }}>
-      <AddBlog getApi={getApi()} />
+      <AddBlog getApi={getApi} />
       <FlatList
-        data={blog}
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={getApi} />
+        }
+        data={blogs}
         keyExtractor={(item) => item._id}
-        renderItem={item}
+        renderItem={renderItem}
       />
     </View>
   );

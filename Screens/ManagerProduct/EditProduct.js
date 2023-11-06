@@ -1,3 +1,4 @@
+import React, { useState } from "react";
 import {
   StyleSheet,
   Text,
@@ -7,8 +8,6 @@ import {
   TouchableOpacity,
   ToastAndroid,
 } from "react-native";
-import React, { useState } from "react";
-// Khai báo các thư viện
 import * as ImagePicker from "expo-image-picker";
 import { Dropdown } from "react-native-element-dropdown";
 import { API_Product } from "../../API/getAPI";
@@ -35,9 +34,7 @@ const EditProduct = ({ navigation, route }) => {
     }
   };
 
-  // Put api
   const putApi = async () => {
-    // Kiểm tra dữ liệu trống
     if (!name || !image || !price || !disription || !quantity || !value) {
       ToastAndroid.showWithGravity(
         "Vui lòng không để trống bất kỳ trường nào.",
@@ -46,13 +43,9 @@ const EditProduct = ({ navigation, route }) => {
       );
       return;
     }
-    // Khai báo FormData
+
     let formData = new FormData();
     formData.append("name", name);
-    // formData.append("price", price);
-    // formData.append("description", disription);
-    // formData.append("quantity", quantity);
-    // formData.append("id_type", value);
 
     let localUri = image.uri;
     let filename = localUri.split("/").pop();
@@ -82,187 +75,98 @@ const EditProduct = ({ navigation, route }) => {
     <View style={styles.container}>
       <View style={styles.image}>
         <TouchableOpacity
-          style={{
-            width: 80,
-            height: 80,
-            borderRadius: 10,
-            justifyContent: "center",
-            alignItems: "center",
-            backgroundColor: "#999999",
-          }}
+          style={styles.imagePicker}
           onPress={() => pickImageAsync()}
         >
-          <Image
-            style={{
-              width: 80,
-              height: 80,
-              resizeMode: "contain",
-              borderRadius: 10,
-            }}
-            source={{ uri: image.uri }}
-          />
+          <Image style={styles.imagePreview} source={{ uri: image.uri }} />
         </TouchableOpacity>
       </View>
 
       <View style={styles.body}>
-        <View
-          style={{
-            marginTop: 10,
-            height: 70,
-            backgroundColor: "white",
-            paddingHorizontal: 20,
-            paddingVertical: 10,
-          }}
-        >
-          <View
-            style={{ flexDirection: "row", justifyContent: "space-between" }}
-          >
-            <Text
-              style={{
-                fontSize: 16,
-              }}
-            >
-              Tên sản phẩm
-            </Text>
-            <Text style={{ color: "gray" }}>{name.length}/120</Text>
-          </View>
-          <TextInput
-            maxLength={120}
-            value={name}
-            onChangeText={setName}
-            style={{
-              marginTop: 4,
+        <InputField
+          label="Tên sản phẩm"
+          value={name}
+          maxLength={120}
+          onChangeText={setName}
+        />
+        <InputField
+          label="Mô tả sản phẩm"
+          value={disription}
+          maxLength={3000}
+          onChangeText={setDisription}
+        />
+
+        <View style={styles.dropdownContainer}>
+          <Dropdown
+            placeholder="Vui lòng chọn"
+            placeholderStyle={styles.dropdownPlaceholder}
+            selectedTextStyle={styles.dropdownSelectedText}
+            style={[styles.dropdown, isFocus && styles.dropdownFocus]}
+            data={dataType}
+            labelField="name"
+            valueField="_id"
+            value={value}
+            onFocus={() => setIsFocus(true)}
+            onBlur={() => setIsFocus(false)}
+            maxHeight={150}
+            onChange={(item) => {
+              setValue(item._id);
+              setIsFocus(false);
             }}
-            placeholder="Nhập tên sản phẩm"
-          />
-        </View>
-        <View
-          style={{
-            marginTop: 10,
-            height: 70,
-            backgroundColor: "white",
-            paddingHorizontal: 20,
-            paddingVertical: 10,
-          }}
-        >
-          <View
-            style={{ flexDirection: "row", justifyContent: "space-between" }}
-          >
-            <Text
-              style={{
-                fontSize: 16,
-              }}
-            >
-              Mô tả sản phẩm
-            </Text>
-            <Text style={{ color: "gray" }}>{disription.length}/3000</Text>
-          </View>
-          <TextInput
-            maxLength={3000}
-            value={disription}
-            onChangeText={setDisription}
-            style={{
-              marginTop: 4,
-            }}
-            placeholder="Nhập mô tả sản phẩm"
           />
         </View>
 
-        <View
-          style={{
-            marginTop: 10,
-            backgroundColor: "white",
-            paddingHorizontal: 20,
-            paddingVertical: 10,
-            flex: 1,
-          }}
-        >
-          <View
-            style={{
-              flexDirection: "row",
-              justifyContent: "space-between",
-              width: "100%",
-              paddingBottom: 10,
-              borderBottomWidth: 1,
-              borderColor: "#EEEEEE",
-            }}
-          >
-            <Text
-              style={{
-                fontSize: 16,
-              }}
-            >
-              Thể loại
-            </Text>
-            <View>
-              <Dropdown
-                placeholder="Vui lòng chọn"
-                placeholderStyle={{ fontSize: 13 }}
-                selectedTextStyle={{ fontSize: 13 }}
-                style={[styles.dropdown, isFocus && { borderColor: "blue" }]}
-                data={dataType}
-                labelField="name"
-                valueField="_id"
-                value={value}
-                onFocus={() => setIsFocus(true)}
-                onBlur={() => setIsFocus(false)}
-                maxHeight={150}
-                onChange={(item) => {
-                  setValue(item._id);
-                  setIsFocus(false);
-                }}
-              />
-            </View>
-          </View>
+        <NumericInput label="Giá bán" value={price} onChangeText={setPrice} />
+        <NumericInput
+          label="Số lượng"
+          value={quantity}
+          onChangeText={setQuantity}
+        />
 
-          <View
-            style={{
-              flexDirection: "row",
-              paddingVertical: 10,
-              marginTop: 6,
-              justifyContent: "space-between",
-              borderBottomWidth: 1,
-              borderColor: "#EEEEEE",
-            }}
-          >
-            <Text>Giá bán</Text>
-            <TextInput
-              value={price}
-              keyboardType="numeric"
-              onChangeText={setPrice}
-              placeholder="Nhập giá"
-            />
-          </View>
-
-          <View
-            style={{
-              flexDirection: "row",
-              paddingVertical: 10,
-              marginTop: 6,
-              justifyContent: "space-between",
-              borderBottomWidth: 1,
-              borderColor: "#EEEEEE",
-            }}
-          >
-            <Text>Số lượng</Text>
-            <TextInput
-              value={quantity}
-              keyboardType="numeric"
-              onChangeText={setQuantity}
-              placeholder="Số lượng sản phẩm"
-            />
-          </View>
-
-          <TouchableOpacity style={styles.btn} onPress={() => putApi()}>
-            <Text style={{ color: "white" }}>Xác nhận</Text>
-          </TouchableOpacity>
-        </View>
+        <TouchableOpacity style={styles.btn} onPress={() => putApi()}>
+          <Text style={styles.btnText}>Xác nhận</Text>
+        </TouchableOpacity>
       </View>
     </View>
   );
 };
 
-export default EditProduct;
+const InputField = ({ label, value, maxLength, onChangeText }) => {
+  return (
+    <View style={styles.inputContainer}>
+      <View style={styles.inputHeader}>
+        <Text style={styles.inputLabel}>{label}</Text>
+        <Text
+          style={styles.inputCounter}
+        >{`${value.length}/${maxLength}`}</Text>
+      </View>
+      <TextInput
+        maxLength={maxLength}
+        value={value}
+        onChangeText={onChangeText}
+        style={styles.input}
+        placeholder={`Nhập ${label.toLowerCase()}`}
+      />
+    </View>
+  );
+};
+
+const NumericInput = ({ label, value, onChangeText }) => {
+  return (
+    <View style={styles.inputContainer}>
+      <View style={styles.inputHeader}>
+        <Text style={styles.inputLabel}>{label}</Text>
+      </View>
+      <TextInput
+        keyboardType="numeric"
+        value={value.toString()}
+        onChangeText={(text) => onChangeText(parseInt(text) || 0)}
+        style={styles.input}
+        placeholder={`Nhập ${label.toLowerCase()}`}
+      />
+    </View>
+  );
+};
 
 const styles = StyleSheet.create({
   container: {
@@ -276,8 +180,49 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     flexDirection: "row",
   },
+  imagePicker: {
+    width: 80,
+    height: 80,
+    borderRadius: 10,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "#999999",
+  },
+  imagePreview: {
+    width: 80,
+    height: 80,
+    resizeMode: "contain",
+    borderRadius: 10,
+  },
   body: {
     flex: 1,
+    paddingHorizontal: 20,
+  },
+  inputContainer: {
+    marginTop: 10,
+    height: 70,
+    backgroundColor: "white",
+    paddingHorizontal: 20,
+    paddingVertical: 10,
+  },
+  inputHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+  },
+  inputLabel: {
+    fontSize: 16,
+  },
+  inputCounter: {
+    color: "gray",
+  },
+  input: {
+    marginTop: 4,
+  },
+  dropdownContainer: {
+    marginTop: 10,
+    backgroundColor: "white",
+    paddingHorizontal: 20,
+    paddingVertical: 10,
   },
   dropdown: {
     height: 40,
@@ -286,6 +231,15 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     paddingHorizontal: 8,
     width: 100,
+  },
+  dropdownPlaceholder: {
+    fontSize: 13,
+  },
+  dropdownSelectedText: {
+    fontSize: 13,
+  },
+  dropdownFocus: {
+    borderColor: "blue",
   },
   btn: {
     width: "100%",
@@ -296,4 +250,9 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
   },
+  btnText: {
+    color: "white",
+  },
 });
+
+export default EditProduct;

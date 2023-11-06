@@ -31,9 +31,7 @@ const EditBlog = (props) => {
     }
   };
 
-  // Put api
   const putApi = async () => {
-    // Kiểm tra dữ liệu trống
     if (!title || !image || !desc) {
       ToastAndroid.showWithGravity(
         "Vui lòng không để trống bất kỳ trường nào.",
@@ -42,7 +40,7 @@ const EditBlog = (props) => {
       );
       return;
     }
-    // Khai báo FormData
+
     let formData = new FormData();
     formData.append("title", title);
     formData.append("desc", desc);
@@ -65,9 +63,7 @@ const EditBlog = (props) => {
         ToastAndroid.LONG,
         ToastAndroid.BOTTOM
       );
-      // Reset lại dữ liệu từ componet cha
-      getApi;
-      // Tắt modal khi thành công
+      getApi();
       setshowDialog(false);
     } catch (error) {
       console.log("Put api: " + error.message);
@@ -80,50 +76,17 @@ const EditBlog = (props) => {
         visible={showDialog}
         transparent={true}
         animationType="fade"
-        onRequestClose={() => {
-          setshowDialog(false);
-        }}
+        onRequestClose={() => setshowDialog(false)}
       >
-        <View
-          style={{
-            backgroundColor: Colors.wwhite,
-            elevation: 2,
-            width: "80%",
-            alignSelf: "center",
-            height: "80%",
-          }}
-        >
+        <View style={styles.container}>
           <TouchableOpacity
-            style={styles.andialog}
-            onPress={() => {
-              setshowDialog(false);
-            }}
+            style={styles.closeButton}
+            onPress={() => setshowDialog(false)}
           >
-            <Text
-              style={{
-                color: "red",
-                fontWeight: "bold",
-                textAlign: "right",
-                marginRight: 20,
-                fontSize: 20,
-                marginTop: 10,
-              }}
-            >
-              X
-            </Text>
+            <Text style={styles.closeText}>X</Text>
           </TouchableOpacity>
-          <Text
-            style={{
-              textAlign: "center",
-              marginTop: 15,
-              fontSize: 24,
-              fontWeight: "bold",
-              color: Colors.black,
-            }}
-          >
-            Edit blog
-          </Text>
-          <View style={{ margin: 10 }}>
+          <Text style={styles.modalTitle}>Edit blog</Text>
+          <View style={styles.modalContent}>
             <Text style={styles.title}>Tiêu đề</Text>
             <TextInput
               placeholder="Tiêu đề"
@@ -140,53 +103,24 @@ const EditBlog = (props) => {
             />
             <Text style={styles.title}>Ảnh</Text>
             <TouchableOpacity
-              style={{
-                width: 200,
-                height: 200,
-                borderRadius: 10,
-                backgroundColor: Colors.gray,
-                alignSelf: "center",
-                alignItems: "center",
-                justifyContent: "center",
-              }}
+              style={styles.imagePicker}
               onPress={() => pickImageAsync()}
             >
-              <Image
-                style={{
-                  width: 200,
-                  height: 200,
-                  resizeMode: "contain",
-                  borderRadius: 10,
-                }}
-                source={{ uri: image.uri }}
-              />
+              {image ? (
+                <Image style={styles.image} source={{ uri: image.uri }} />
+              ) : (
+                <Text>Chọn ảnh</Text>
+              )}
             </TouchableOpacity>
           </View>
-
-          <TouchableOpacity
-            style={{
-              backgroundColor: Colors.black,
-              width: 100,
-              height: 40,
-              justifyContent: "center",
-              alignItems: "center",
-              borderRadius: 10,
-              alignSelf: "flex-end",
-              margin: 10,
-            }}
-            onPress={() => putApi()}
-          >
-            <Text
-              style={{ color: Colors.wwhite, fontWeight: "bold", fontSize: 18 }}
-            >
-              Save
-            </Text>
+          <TouchableOpacity style={styles.saveButton} onPress={() => putApi()}>
+            <Text style={styles.saveText}>Save</Text>
           </TouchableOpacity>
         </View>
       </Modal>
       <TouchableOpacity onPress={() => setshowDialog(true)}>
         <Image
-          style={{ height: 30, width: 30, margin: 10 }}
+          style={styles.addButton}
           source={{
             uri: "https://cdn-icons-png.flaticon.com/512/3597/3597075.png",
           }}
@@ -196,9 +130,37 @@ const EditBlog = (props) => {
   );
 };
 
-export default EditBlog;
-
 const styles = StyleSheet.create({
+  container: {
+    backgroundColor: Colors.wwhite,
+    elevation: 2,
+    width: "80%",
+    alignSelf: "center",
+    height: "80%",
+  },
+  closeButton: {
+    position: "absolute",
+    zIndex: 1,
+    top: 10,
+    right: 20,
+  },
+  closeText: {
+    color: "red",
+    fontWeight: "bold",
+    textAlign: "right",
+    fontSize: 20,
+    marginTop: 10,
+  },
+  modalTitle: {
+    textAlign: "center",
+    marginTop: 15,
+    fontSize: 24,
+    fontWeight: "bold",
+    color: Colors.black,
+  },
+  modalContent: {
+    margin: 10,
+  },
   title: {
     fontSize: 17,
     fontWeight: "bold",
@@ -208,4 +170,41 @@ const styles = StyleSheet.create({
     height: 50,
     margin: 10,
   },
+  imagePicker: {
+    width: 200,
+    height: 200,
+    borderRadius: 10,
+    backgroundColor: Colors.gray,
+    alignSelf: "center",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  image: {
+    width: 200,
+    height: 200,
+    resizeMode: "contain",
+    borderRadius: 10,
+  },
+  saveButton: {
+    backgroundColor: Colors.black,
+    width: 100,
+    height: 40,
+    justifyContent: "center",
+    alignItems: "center",
+    borderRadius: 10,
+    alignSelf: "flex-end",
+    margin: 10,
+  },
+  saveText: {
+    color: Colors.wwhite,
+    fontWeight: "bold",
+    fontSize: 18,
+  },
+  addButton: {
+    height: 30,
+    width: 30,
+    margin: 10,
+  },
 });
+
+export default EditBlog;

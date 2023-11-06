@@ -1,35 +1,42 @@
-import { Text, View, Image } from "react-native";
 import React from "react";
+import { Text, View, Image, StyleSheet } from "react-native";
 
-const CustomDrawerHeder = () => {
+const CustomDrawerHeader = () => {
   return (
-    <View
-      style={{
-        height: 100,
-        backgroundColor: "gray",
-        flexDirection: "row",
-        alignItems: "center",
-        marginBottom: 20,
-      }}
-    >
-      <Image
-        style={{
-          width: 50,
-          height: 50,
-          borderRadius: 25,
-          marginLeft: 10,
-        }}
-        source={require("../Image/avatar.png")}
-      />
-      <View
-        style={{
-          marginLeft: 10,
-        }}
-      >
-        <Text style={{ fontWeight: "bold", color: "white" }}>Admin</Text>
-        <Text style={{ color: "white" }}>Admin@gmail.com</Text>
+    <View style={styles.container}>
+      <Image style={styles.avatar} source={require("../Image/avatar.png")} />
+      <View style={styles.textContainer}>
+        <Text style={styles.boldText}>Admin</Text>
+        <Text style={styles.whiteText}>Admin@gmail.com</Text>
       </View>
     </View>
   );
 };
-export default CustomDrawerHeder;
+
+const styles = StyleSheet.create({
+  container: {
+    height: 100,
+    backgroundColor: "gray",
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 20,
+  },
+  avatar: {
+    width: 50,
+    height: 50,
+    borderRadius: 25,
+    marginLeft: 10,
+  },
+  textContainer: {
+    marginLeft: 10,
+  },
+  boldText: {
+    fontWeight: "bold",
+    color: "white",
+  },
+  whiteText: {
+    color: "white",
+  },
+});
+
+export default CustomDrawerHeader;

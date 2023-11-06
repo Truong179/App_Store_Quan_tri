@@ -1,18 +1,18 @@
+import React, { useState } from "react";
 import {
+  Text,
+  View,
   Image,
   Modal,
   StyleSheet,
-  Text,
   TextInput,
-  ToastAndroid,
   TouchableOpacity,
-  View,
+  ToastAndroid,
 } from "react-native";
-import React, { useState } from "react";
-import Colors from "../../src/Colors";
 import * as ImagePicker from "expo-image-picker";
 import axios from "axios";
 import { API_Blog } from "../../API/getAPI";
+import Colors from "../../src/Colors";
 
 const AddBlog = (props) => {
   const { getApi } = props;
@@ -26,14 +26,12 @@ const AddBlog = (props) => {
       mediaType: "photo",
       allowsEditing: true,
     });
-    if (!result.canceled) {
+    if (!result.cancelled) {
       setImage(result.assets[0]);
     }
   };
 
-  // Post api
   const postApi = async () => {
-    // Kiểm tra dữ liệu trống
     if (!title || !image || !desc) {
       ToastAndroid.showWithGravity(
         "Vui lòng không để trống bất kỳ trường nào.",
@@ -42,7 +40,7 @@ const AddBlog = (props) => {
       );
       return;
     }
-    // Khai báo FormData
+
     let formData = new FormData();
     formData.append("title", title);
     formData.append("desc", desc);
@@ -66,9 +64,7 @@ const AddBlog = (props) => {
         ToastAndroid.BOTTOM
       );
       setImage("");
-      // Reset lại dữ liệu từ componet cha
-      getApi;
-      // Tắt modal khi thành công
+      getApi();
       setshowDialog(false);
     } catch (error) {
       console.log("Post api: " + error.message);
@@ -82,50 +78,17 @@ const AddBlog = (props) => {
           visible={showDialog}
           transparent={true}
           animationType="fade"
-          onRequestClose={() => {
-            setshowDialog(false);
-          }}
+          onRequestClose={() => setshowDialog(false)}
         >
-          <View
-            style={{
-              backgroundColor: Colors.wwhite,
-              width: "80%",
-              alignSelf: "center",
-              height: "80%",
-              elevation: 2,
-            }}
-          >
+          <View style={styles.container}>
             <TouchableOpacity
               style={styles.andialog}
-              onPress={() => {
-                setshowDialog(false);
-              }}
+              onPress={() => setshowDialog(false)}
             >
-              <Text
-                style={{
-                  color: "red",
-                  fontWeight: "bold",
-                  textAlign: "right",
-                  marginRight: 20,
-                  fontSize: 20,
-                  marginTop: 10,
-                }}
-              >
-                X
-              </Text>
+              <Text style={styles.closeText}>X</Text>
             </TouchableOpacity>
-            <Text
-              style={{
-                textAlign: "center",
-                marginTop: 15,
-                fontSize: 24,
-                fontWeight: "bold",
-                color: Colors.black,
-              }}
-            >
-              Add blog
-            </Text>
-            <View style={{ margin: 10 }}>
+            <Text style={styles.modalTitle}>Add blog</Text>
+            <View style={styles.inputContainer}>
               <Text style={styles.title}>Tiêu đề</Text>
               <TextInput
                 placeholder="Tiêu đề"
@@ -133,7 +96,6 @@ const AddBlog = (props) => {
                 onChangeText={setTitle}
               />
               <Text style={styles.title}>Nội dung</Text>
-
               <TextInput
                 placeholder="Nội dung bài viết"
                 style={styles.input}
@@ -141,66 +103,27 @@ const AddBlog = (props) => {
               />
               <Text style={styles.title}>Ảnh</Text>
               <TouchableOpacity
-                style={{
-                  width: 200,
-                  height: 200,
-                  borderRadius: 10,
-                  backgroundColor: Colors.gray,
-                  alignSelf: "center",
-                  alignItems: "center",
-                  justifyContent: "center",
-                }}
+                style={styles.imageContainer}
                 onPress={() => pickImageAsync()}
               >
                 {image ? (
-                  <Image
-                    style={{
-                      width: 200,
-                      height: 200,
-                      resizeMode: "contain",
-                      borderRadius: 10,
-                    }}
-                    source={{ uri: image.uri }}
-                  />
+                  <Image style={styles.image} source={{ uri: image.uri }} />
                 ) : (
-                  <Text>Chọn ảnh</Text>
+                  <Text style={styles.imageText}>Chọn ảnh</Text>
                 )}
               </TouchableOpacity>
             </View>
-
             <TouchableOpacity
-              style={{
-                backgroundColor: Colors.black,
-                width: 100,
-                height: 40,
-                justifyContent: "center",
-                alignItems: "center",
-                borderRadius: 10,
-                alignSelf: "flex-end",
-                margin: 10,
-              }}
+              style={styles.saveButton}
               onPress={() => postApi()}
             >
-              <Text
-                style={{
-                  color: Colors.wwhite,
-                  fontWeight: "bold",
-                  fontSize: 18,
-                }}
-              >
-                Save
-              </Text>
+              <Text style={styles.saveButtonText}>Save</Text>
             </TouchableOpacity>
           </View>
         </Modal>
         <TouchableOpacity onPress={() => setshowDialog(true)}>
           <Image
-            style={{
-              height: 30,
-              width: 30,
-              alignSelf: "flex-end",
-              marginRight: 20,
-            }}
+            style={styles.icon}
             source={{
               uri: "https://cdn-icons-png.flaticon.com/512/262/262038.png",
             }}
@@ -211,9 +134,42 @@ const AddBlog = (props) => {
   );
 };
 
-export default AddBlog;
-
 const styles = StyleSheet.create({
+  icon: {
+    height: 30,
+    width: 30,
+    alignSelf: "flex-end",
+    marginRight: 20,
+  },
+  andialog: {
+    position: "absolute",
+    zIndex: 1,
+    top: 10,
+    right: 20,
+  },
+  closeText: {
+    color: "red",
+    fontWeight: "bold",
+    fontSize: 20,
+    marginTop: 10,
+  },
+  container: {
+    backgroundColor: Colors.wwhite,
+    width: "80%",
+    alignSelf: "center",
+    height: "80%",
+    elevation: 2,
+  },
+  modalTitle: {
+    textAlign: "center",
+    marginTop: 15,
+    fontSize: 24,
+    fontWeight: "bold",
+    color: Colors.black,
+  },
+  inputContainer: {
+    margin: 10,
+  },
   title: {
     fontSize: 17,
     fontWeight: "bold",
@@ -223,4 +179,40 @@ const styles = StyleSheet.create({
     height: 50,
     margin: 10,
   },
+  imageContainer: {
+    width: 200,
+    height: 200,
+    borderRadius: 10,
+    backgroundColor: Colors.gray,
+    alignSelf: "center",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  image: {
+    width: 200,
+    height: 200,
+    resizeMode: "contain",
+    borderRadius: 10,
+  },
+  imageText: {
+    fontSize: 16,
+    fontWeight: "bold",
+  },
+  saveButton: {
+    backgroundColor: Colors.black,
+    width: 100,
+    height: 40,
+    justifyContent: "center",
+    alignItems: "center",
+    borderRadius: 10,
+    alignSelf: "flex-end",
+    margin: 10,
+  },
+  saveButtonText: {
+    color: Colors.wwhite,
+    fontWeight: "bold",
+    fontSize: 18,
+  },
 });
+
+export default AddBlog;

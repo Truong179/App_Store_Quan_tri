@@ -1,165 +1,191 @@
-import { FlatList, Image, Text, TouchableOpacity, View } from "react-native";
-import React from "react";
+import React, { useState, useEffect } from "react";
+import {
+  FlatList,
+  Image,
+  RefreshControl,
+  Text,
+  TouchableOpacity,
+  View,
+  StyleSheet,
+  ToastAndroid,
+} from "react-native";
+import axios from "axios";
+import { API_User_Pay } from "../../API/getAPI";
 import Colors from "../../src/Colors";
 
+const USER_ROLE = "Shop";
+
 const DonHang = () => {
-  const donhang = [
-    {
-      id: "1",
-      avatar:
-        "https://img.freepik.com/premium-vector/young-smiling-man-avatar-man-with-brown-beard-mustache-hair-wearing-yellow-sweater-sweatshirt-3d-vector-people-character-illustration-cartoon-minimal-style_365941-860.jpg",
-      name: "TruongNguyen",
-      image:
-        "https://cdn.tgdd.vn/Products/Images/44/231244/macbook-air-m1-2020-gray-600x600.jpg",
-      soluong: "1",
+  const [refreshing, setRefreshing] = useState(false);
+  const [donhang, setDonHang] = useState([]);
 
-      giatien: "20000000",
-      trangthai: "Chờ thanh toán",
-      tensp: "Macbook pro",
-    },
-    {
-      id: "2",
-      avatar:
-        "https://img.freepik.com/premium-vector/young-smiling-man-avatar-man-with-brown-beard-mustache-hair-wearing-yellow-sweater-sweatshirt-3d-vector-people-character-illustration-cartoon-minimal-style_365941-860.jpg",
-      name: "TruongNguyen",
-      image:
-        "https://cdn.tgdd.vn/Products/Images/44/231244/macbook-air-m1-2020-gray-600x600.jpg",
-      soluong: "1",
+  useEffect(() => {
+    fetchData();
+  }, []);
 
-      giatien: "20000000",
-      trangthai: "Chờ thanh toán",
-      tensp: "Macbook pro",
-    },
-    {
-      id: "3",
-      avatar:
-        "https://img.freepik.com/premium-vector/young-smiling-man-avatar-man-with-brown-beard-mustache-hair-wearing-yellow-sweater-sweatshirt-3d-vector-people-character-illustration-cartoon-minimal-style_365941-860.jpg",
-      name: "TruongNguyen",
-      image:
-        "https://cdn.tgdd.vn/Products/Images/44/231244/macbook-air-m1-2020-gray-600x600.jpg",
-      soluong: "1",
+  const fetchData = async () => {
+    setRefreshing(true);
+    try {
+      const res = await axios.get(API_User_Pay, {
+        params: { role: USER_ROLE },
+      });
+      setDonHang(res.data.message["Đang xử lý"]);
+      setRefreshing(false);
+    } catch (error) {
+      console.error("Call API: " + error.message);
+    }
+  };
 
-      giatien: "20000000",
-      trangthai: "Chờ thanh toán",
-      tensp: "Macbook pro",
-    },
-  ];
-  const renderDonhang = ({ item }) => {
-    return (
-      <View
-        style={{
-          flexDirection: "column",
-          marginTop: 10,
-          borderBottomColor: Colors.grey,
-          borderBottomWidth: 10,
-        }}
-      >
-        <View
-          style={{
-            flexDirection: "row",
-            justifyContent: "space-between",
-            margin: 10,
-          }}
-        >
-          <View style={{ flexDirection: "row" }}>
-            <Image
-              style={{
-                width: 30,
-                height: 30,
-                borderRadius: 30,
-                marginRight: 5,
-              }}
-              source={{ uri: item.avatar }}
-            />
-            <Text>{item.name}</Text>
-          </View>
-          <View>
-            <Text style={{ color: Colors.green }}>{item.trangthai}</Text>
-          </View>
-        </View>
-        <View
-          style={{
-            flexDirection: "row",
-            justifyContent: "space-between",
-            margin: 10,
-          }}
-        >
-          <View style={{ flexDirection: "row" }}>
-            <Image
-              style={{ height: 40, width: 50, marginRight: 5 }}
-              source={{ uri: item.image }}
-            />
-            <Text>{item.tensp}</Text>
-          </View>
-          <View>
-            <Text>x{item.soluong}</Text>
-            <Text style={{ color: Colors.red }}>${item.giatien}</Text>
-          </View>
+  const handleDuyet = async (item) => {
+    // Xử lý logic duyệt từng item ở đây
+    try {
+      await axios.put(`${API_User_Pay}${item._id}`, {
+        status: "Đang vận chuyển",
+        updateAll: false,
+      });
+      fetchData();
+    } catch (error) {
+      console.error("Put API: " + error.message);
+    }
+  };
+
+  const handleDuyetTatCa = async () => {
+    // Xử lý logic duyệt tất cả ở đây
+    if (donhang.length === 0) {
+      ToastAndroid.show("Đơn hàng đã được duyệt hết", ToastAndroid.SHORT);
+      return;
+    }
+    try {
+      await axios.put(`${API_User_Pay}demo`, {
+        status: "Đang vận chuyển",
+        updateAll: true,
+      });
+      fetchData();
+    } catch (error) {
+      console.error("Put API: " + error.message);
+    }
+  };
+
+  const renderDonHang = ({ item }) => (
+    <View style={styles.container}>
+      <View style={styles.infoContainer}>
+        <View style={styles.userContainer}>
+          <Image
+            style={styles.userImage}
+            source={{ uri: item.productId.image }}
+          />
+          <Text>{item.userId.fullName}</Text>
         </View>
         <View>
-          <Image source={require("../../src/icons/line.png")} />
-        </View>
-        <View
-          style={{
-            flexDirection: "row",
-            justifyContent: "space-between",
-            margin: 10,
-          }}
-        >
-          <Text>1 sản phẩm</Text>
-          <Text>Thành tiền: {item.giatien} </Text>
-        </View>
-        <View>
-          <Image source={require("../../src/icons/line.png")} />
-        </View>
-        <View style={{ alignItems: "flex-end", margin: 10 }}>
-          <TouchableOpacity
-            style={{
-              backgroundColor: Colors.black,
-              borderRadius: 5,
-              height: 38,
-              alignItems: "center",
-              justifyContent: "center",
-              width: 117,
-            }}
-          >
-            <Text style={{ color: Colors.wwhite }}>Duyệt</Text>
-          </TouchableOpacity>
+          <Text style={{ color: Colors.green }}>{item.status}</Text>
         </View>
       </View>
-    );
-  };
-  return (
-    <View style={{ backgroundColor: Colors.wwhite, flex: 1 }}>
-      <FlatList
-        data={donhang}
-        keyExtractor={(item) => {
-          return item.id;
-        }}
-        renderItem={renderDonhang}
-      />
-      <View
-        style={{
-          alignItems: "center",
-          justifyContent: "center",
-        }}
-      >
+      <View style={styles.productContainer}>
+        <Image
+          style={styles.productImage}
+          source={{ uri: item.productId.image }}
+        />
+        <View>
+          <Text>{item.productId.name}</Text>
+          <Text>x{item.quantity}</Text>
+          <Text style={{ color: Colors.red }}>${item.productId.price}</Text>
+        </View>
+      </View>
+      <View style={styles.divider}>
+        <Image source={require("../../src/icons/line.png")} />
+      </View>
+      <View style={styles.totalContainer}>
+        <Text>{item.quantity} sản phẩm</Text>
+        <Text>Thành tiền: {item.totalPrice} </Text>
+      </View>
+      <View style={styles.divider}>
+        <Image source={require("../../src/icons/line.png")} />
+      </View>
+      <View style={styles.buttonContainer}>
         <TouchableOpacity
-          style={{
-            backgroundColor: Colors.black,
-            borderRadius: 5,
-            height: 38,
-            alignItems: "center",
-            justifyContent: "center",
-            width: 350,
-            margin: 10,
-          }}
+          style={styles.button}
+          onPress={() => handleDuyet(item)}
         >
+          <Text style={{ color: Colors.wwhite }}>Duyệt</Text>
+        </TouchableOpacity>
+      </View>
+    </View>
+  );
+
+  return (
+    <View style={styles.screen}>
+      <FlatList
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={fetchData} />
+        }
+        data={donhang}
+        keyExtractor={(item) => item._id}
+        renderItem={renderDonHang}
+      />
+      <View style={styles.buttonContainer}>
+        <TouchableOpacity style={styles.button} onPress={handleDuyetTatCa}>
           <Text style={{ color: Colors.wwhite }}>Duyệt tất cả</Text>
         </TouchableOpacity>
       </View>
     </View>
   );
 };
+
+const styles = StyleSheet.create({
+  screen: {
+    flex: 1,
+    backgroundColor: Colors.wwhite,
+  },
+  container: {
+    marginVertical: 10,
+    borderBottomWidth: 10,
+    borderBottomColor: Colors.grey,
+  },
+  infoContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    margin: 10,
+  },
+  userContainer: {
+    flexDirection: "row",
+  },
+  userImage: {
+    width: 30,
+    height: 30,
+    borderRadius: 30,
+    marginRight: 5,
+  },
+  productContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    margin: 10,
+  },
+  productImage: {
+    height: 40,
+    width: 50,
+    marginRight: 5,
+  },
+  divider: {
+    marginTop: 10,
+  },
+  totalContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    margin: 10,
+  },
+  buttonContainer: {
+    alignItems: "center",
+    justifyContent: "center",
+    margin: 10,
+  },
+  button: {
+    backgroundColor: Colors.black,
+    borderRadius: 5,
+    height: 38,
+    alignItems: "center",
+    justifyContent: "center",
+    width: 117,
+  },
+});
 
 export default DonHang;

@@ -1,5 +1,5 @@
-import { Image } from "react-native";
 import React, { useState } from "react";
+import { Image } from "react-native";
 import {
   DrawerItemList,
   createDrawerNavigator,
@@ -7,15 +7,11 @@ import {
 import { NavigationContainer } from "@react-navigation/native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
-const Drawer = createDrawerNavigator();
-const Stack = createNativeStackNavigator();
-
 import QuanLiDH from "./Screens/QuanLiDH";
-import NhanTin from "./Screens/NhanTin";
 import ThongKe from "./Screens/Stats/ThongKe";
 import QuanLiTK from "./Screens/ManagerAcount/QuanLiTK";
 import Home from "./Screens/Home/home";
-import CustomDrawerHeder from "./compoment/headerDrawer";
+import CustomDrawerHeader from "./compoment/headerDrawer";
 import ChangePassword from "./Screens/ChangePassword";
 import InformationAcount from "./Screens/ManagerAcount/informationAcount";
 import QuanLiBlog from "./Screens/Blog/QuanLiBlog";
@@ -24,6 +20,9 @@ import AddProduct from "./Screens/ManagerProduct/addProduct";
 import EditProduct from "./Screens/ManagerProduct/EditProduct";
 import Login from "./Screens/Login/Login";
 import InfoShop from "./Screens/ManagerAcount/InfoShop";
+
+const Drawer = createDrawerNavigator();
+const Stack = createNativeStackNavigator();
 
 function App() {
   const [isLogin, setIsLogin] = useState(false);
@@ -77,7 +76,7 @@ function App() {
       <Drawer.Navigator
         drawerContent={(props) => (
           <SafeAreaView>
-            <CustomDrawerHeder />
+            <CustomDrawerHeader />
             <DrawerItemList {...props} />
           </SafeAreaView>
         )}
@@ -124,7 +123,6 @@ function App() {
           component={ManagerProductNav}
           options={{
             title: "Quản lý sản phẩm",
-
             drawerActiveBackgroundColor: "#D3D3D3",
             drawerActiveTintColor: "black",
             drawerIcon: ({ focused, size }) => (
@@ -151,24 +149,6 @@ function App() {
                   focused
                     ? require("./Image/blog_focus.png")
                     : require("./Image/blog.png")
-                }
-                style={{ height: size, width: size }}
-              />
-            ),
-          }}
-        />
-        <Drawer.Screen
-          name="Nhắn tin"
-          component={NhanTin}
-          options={{
-            drawerActiveBackgroundColor: "#D3D3D3",
-            drawerActiveTintColor: "black",
-            drawerIcon: ({ focused, size }) => (
-              <Image
-                source={
-                  focused
-                    ? require("./Image/chat_focus.png")
-                    : require("./Image/chat.png")
                 }
                 style={{ height: size, width: size }}
               />
@@ -249,4 +229,5 @@ function App() {
     </NavigationContainer>
   );
 }
+
 export default App;

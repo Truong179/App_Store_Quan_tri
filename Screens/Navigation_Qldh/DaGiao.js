@@ -1,131 +1,119 @@
-import { FlatList, Image, StyleSheet, Text, View } from "react-native";
-import React from "react";
+import React, { useEffect, useState } from "react";
+import {
+  FlatList,
+  Image,
+  RefreshControl,
+  Text,
+  View,
+  StyleSheet,
+} from "react-native";
 import Colors from "../../src/Colors";
+import axios from "axios";
+import { API_User_Pay } from "../../API/getAPI";
+
+const USER_ROLE = "Shop";
 
 const DaGiao = () => {
-  const donhang = [
-    {
-      id: "1",
-      avatar:
-        "https://img.freepik.com/premium-vector/young-smiling-man-avatar-man-with-brown-beard-mustache-hair-wearing-yellow-sweater-sweatshirt-3d-vector-people-character-illustration-cartoon-minimal-style_365941-860.jpg",
-      name: "TruongNguyen",
-      image:
-        "https://cdn.tgdd.vn/Products/Images/44/231244/macbook-air-m1-2020-gray-600x600.jpg",
-      soluong: "1",
+  const [refreshing, setRefreshing] = useState(false);
+  const [donhang, setDonHang] = useState([]);
 
-      giatien: "20000000",
-      trangthai: "Đã giao",
-      tensp: "Macbook pro",
-    },
-    {
-      id: "2",
-      avatar:
-        "https://img.freepik.com/premium-vector/young-smiling-man-avatar-man-with-brown-beard-mustache-hair-wearing-yellow-sweater-sweatshirt-3d-vector-people-character-illustration-cartoon-minimal-style_365941-860.jpg",
-      name: "TruongNguyen",
-      image:
-        "https://cdn.tgdd.vn/Products/Images/44/231244/macbook-air-m1-2020-gray-600x600.jpg",
-      soluong: "1",
+  useEffect(() => {
+    fetchData();
+  }, []);
 
-      giatien: "20000000",
-      trangthai: "Đã giao",
-      tensp: "Macbook pro",
-    },
-    {
-      id: "3",
-      avatar:
-        "https://img.freepik.com/premium-vector/young-smiling-man-avatar-man-with-brown-beard-mustache-hair-wearing-yellow-sweater-sweatshirt-3d-vector-people-character-illustration-cartoon-minimal-style_365941-860.jpg",
-      name: "TruongNguyen",
-      image:
-        "https://cdn.tgdd.vn/Products/Images/44/231244/macbook-air-m1-2020-gray-600x600.jpg",
-      soluong: "1",
+  const fetchData = async () => {
+    setRefreshing(true);
+    try {
+      const res = await axios.get(API_User_Pay, {
+        params: { role: USER_ROLE },
+      });
+      setDonHang(res.data.message["Đã giao"]);
+      setRefreshing(false);
+    } catch (error) {
+      console.error("Call API: " + error.message);
+    }
+  };
 
-      giatien: "20000000",
-      trangthai: "Đã giao",
-      tensp: "Macbook pro",
-    },
-  ];
-  const renderDonhang = ({ item }) => {
-    return (
-      <View
-        style={{
-          flexDirection: "column",
-          marginTop: 10,
-          borderBottomColor: Colors.grey,
-          borderBottomWidth: 10,
-        }}
-      >
-        <View
-          style={{
-            flexDirection: "row",
-            justifyContent: "space-between",
-            margin: 10,
-          }}
-        >
-          <View style={{ flexDirection: "row" }}>
-            <Image
-              style={{
-                width: 30,
-                height: 30,
-                borderRadius: 30,
-                marginRight: 5,
-              }}
-              source={{ uri: item.avatar }}
-            />
-            <Text>{item.name}</Text>
-          </View>
-          <View>
-            <Text style={{ color: Colors.blue }}>{item.trangthai}</Text>
-          </View>
-        </View>
-        <View
-          style={{
-            flexDirection: "row",
-            justifyContent: "space-between",
-            margin: 10,
-          }}
-        >
-          <View style={{ flexDirection: "row" }}>
-            <Image
-              style={{ height: 40, width: 50, marginRight: 5 }}
-              source={{ uri: item.image }}
-            />
-            <Text>{item.tensp}</Text>
-          </View>
-          <View>
-            <Text>x{item.soluong}</Text>
-            <Text style={{ color: Colors.red }}>${item.giatien}</Text>
-          </View>
+  const renderDonHangItem = ({ item }) => (
+    <View style={styles.itemContainer}>
+      <View style={styles.rowContainer}>
+        <View style={styles.userInfoContainer}>
+          <Image style={styles.avatar} source={{ uri: item.productId.image }} />
+          <Text>{item.userId.fullName}</Text>
         </View>
         <View>
-          <Image source={require("../../src/icons/line.png")} />
-        </View>
-        <View
-          style={{
-            flexDirection: "row",
-            justifyContent: "space-between",
-            margin: 10,
-          }}
-        >
-          <Text>1 sản phẩm</Text>
-          <Text>Thành tiền: {item.giatien} </Text>
-        </View>
-        <View>
-          <Image source={require("../../src/icons/line.png")} />
+          <Text style={{ color: Colors.blue }}>{item.status}</Text>
         </View>
       </View>
-    );
-  };
+      <View style={styles.rowContainer}>
+        <View style={styles.productInfoContainer}>
+          <Image
+            style={styles.productImage}
+            source={{ uri: item.productId.image }}
+          />
+          <Text>{item.productId.name}</Text>
+        </View>
+        <View>
+          <Text>x{item.quantity}</Text>
+          <Text style={{ color: Colors.red }}>${item.productId.price}</Text>
+        </View>
+      </View>
+      <Image source={require("../../src/icons/line.png")} />
+      <View style={styles.rowContainer}>
+        <Text>{item.quantity} sản phẩm</Text>
+        <Text>Thành tiền: {item.totalPrice}</Text>
+      </View>
+      <Image source={require("../../src/icons/line.png")} />
+    </View>
+  );
+
   return (
-    <View style={{ backgroundColor: Colors.wwhite, flex: 1 }}>
+    <View style={styles.container}>
       <FlatList
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={fetchData} />
+        }
         data={donhang}
-        keyExtractor={(item) => {
-          return item.id;
-        }}
-        renderItem={renderDonhang}
-      ></FlatList>
+        keyExtractor={(item) => item._id}
+        renderItem={renderDonHangItem}
+      />
     </View>
   );
 };
+
+const styles = StyleSheet.create({
+  container: {
+    backgroundColor: Colors.wwhite,
+    flex: 1,
+  },
+  itemContainer: {
+    flexDirection: "column",
+    marginTop: 10,
+    borderBottomColor: Colors.grey,
+    borderBottomWidth: 10,
+  },
+  rowContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    margin: 10,
+  },
+  userInfoContainer: {
+    flexDirection: "row",
+  },
+  avatar: {
+    width: 30,
+    height: 30,
+    borderRadius: 30,
+    marginRight: 5,
+  },
+  productInfoContainer: {
+    flexDirection: "row",
+  },
+  productImage: {
+    height: 40,
+    width: 50,
+    marginRight: 5,
+  },
+});
 
 export default DaGiao;

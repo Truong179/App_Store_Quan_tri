@@ -7,6 +7,7 @@ import DaHuy from "./Navigation_Qldh/DaHuy";
 import Colors from "../src/Colors";
 
 const Tab = createMaterialTopTabNavigator();
+
 const QuanLiDH = () => {
   return (
     <Tab.Navigator
