@@ -4,16 +4,17 @@ import {
   FlatList,
   Image,
   RefreshControl,
+  StyleSheet,
   Text,
   ToastAndroid,
   TouchableOpacity,
   View,
 } from "react-native";
-import Colors from "../../src/Colors";
-import EditBlog from "./EditBlog";
-import AddBlog from "./AddBlog";
+import Colors from "../src/Colors";
+import EditBlog from "./Blog/EditBlog";
+import AddBlog from "./Blog/AddBlog";
 import axios from "axios";
-import { API_Blog } from "../../API/getAPI";
+import { API_Blog } from "../API/getAPI";
 
 const QuanLiBlog = () => {
   const [refreshing, setRefreshing] = useState(false);
@@ -64,45 +65,23 @@ const QuanLiBlog = () => {
 
   const renderItem = ({ item }) => {
     return (
-      <View style={{ backgroundColor: Colors.grey, marginTop: "2%" }}>
-        <View style={{ flexDirection: "row", margin: 10 }}>
-          <View
-            style={{
-              width: "30%",
-              backgroundColor: Colors.grey,
-              marginRight: 5,
-            }}
-          >
-            <Image
-              style={{
-                height: 80,
-                width: "100%",
-                borderRadius: 10,
-                resizeMode: "contain",
-              }}
-              source={{ uri: item.image }}
-            />
-          </View>
-          <View style={{ width: "69%" }}>
-            <Text
-              style={{ fontSize: 18, fontWeight: "bold" }}
-              numberOfLines={2}
-            >
+      <View style={styles.blogContainer}>
+        <View style={styles.blogContent}>
+          <Image style={styles.blogImage} source={{ uri: item.image }} />
+          <View style={styles.blogTextContainer}>
+            <Text style={styles.blogTitle} numberOfLines={2}>
               {item.title}
             </Text>
-            <Text numberOfLines={2}>{item.desc}</Text>
+            <Text style={styles.blogDescription} numberOfLines={2}>
+              {item.desc}
+            </Text>
           </View>
         </View>
-        <View style={{ flexDirection: "row", alignSelf: "flex-end" }}>
+        <View style={styles.blogActions}>
           <EditBlog item={item} />
           <TouchableOpacity onPress={() => deleteApi(item._id)}>
             <Image
-              style={{
-                height: 30,
-                width: 30,
-                alignSelf: "flex-end",
-                margin: 10,
-              }}
+              style={styles.deleteIcon}
               source={{
                 uri: "https://cdn-icons-png.flaticon.com/512/3687/3687412.png",
               }}
@@ -114,7 +93,7 @@ const QuanLiBlog = () => {
   };
 
   return (
-    <View style={{ flex: 1, backgroundColor: Colors.wwhite }}>
+    <View style={styles.container}>
       <AddBlog getApi={getApi} />
       <FlatList
         refreshControl={
@@ -129,3 +108,45 @@ const QuanLiBlog = () => {
 };
 
 export default QuanLiBlog;
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: Colors.wwhite,
+  },
+  blogContainer: {
+    backgroundColor: Colors.grey,
+    marginTop: "2%",
+  },
+  blogContent: {
+    flexDirection: "row",
+    margin: 10,
+  },
+  blogImage: {
+    height: 80,
+    width: "30%",
+    borderRadius: 10,
+    resizeMode: "contain",
+  },
+  blogTextContainer: {
+    width: "69%",
+    left: "5%",
+  },
+  blogTitle: {
+    fontSize: 18,
+    fontWeight: "bold",
+  },
+  blogDescription: {
+    fontSize: 16,
+  },
+  blogActions: {
+    flexDirection: "row",
+    alignSelf: "flex-end",
+  },
+  deleteIcon: {
+    height: 30,
+    width: 30,
+    alignSelf: "flex-end",
+    margin: 10,
+  },
+});

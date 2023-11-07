@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import { Image } from "react-native";
 import {
   DrawerItemList,
@@ -8,14 +8,14 @@ import { NavigationContainer } from "@react-navigation/native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import QuanLiDH from "./Screens/QuanLiDH";
-import ThongKe from "./Screens/Stats/ThongKe";
-import QuanLiTK from "./Screens/ManagerAcount/QuanLiTK";
-import Home from "./Screens/Home/home";
+import ThongKe from "./Screens/ThongKe";
+import QuanLiTK from "./Screens/QuanLiTK";
+import Home from "./Screens/home";
 import CustomDrawerHeader from "./compoment/headerDrawer";
-import ChangePassword from "./Screens/ChangePassword";
-import InformationAcount from "./Screens/ManagerAcount/informationAcount";
-import QuanLiBlog from "./Screens/Blog/QuanLiBlog";
-import ListProduct from "./Screens/ManagerProduct/listProduct";
+import ChangePassword from "./Screens/ManagerAcount/ChangePassword";
+import InformationAcount from "./Screens/ManagerAcount/InfoAccount";
+import QuanLiBlog from "./Screens/QuanLiBlog";
+import ListProduct from "./Screens/QuanLiSp";
 import AddProduct from "./Screens/ManagerProduct/addProduct";
 import EditProduct from "./Screens/ManagerProduct/EditProduct";
 import Login from "./Screens/Login/Login";
@@ -25,52 +25,6 @@ const Drawer = createDrawerNavigator();
 const Stack = createNativeStackNavigator();
 
 function App() {
-  const [isLogin, setIsLogin] = useState(false);
-
-  function ManagerProductNav() {
-    return (
-      <Stack.Navigator>
-        <Stack.Screen
-          name="ListProduct"
-          component={ListProduct}
-          options={{ headerShown: false }}
-        />
-        <Stack.Screen
-          name="AddProduct"
-          component={AddProduct}
-          options={{ title: "Thêm sản phẩm" }}
-        />
-        <Stack.Screen
-          name="EditProduct"
-          component={EditProduct}
-          options={{ title: "Sửa sản phẩm" }}
-        />
-      </Stack.Navigator>
-    );
-  }
-
-  function ManagerAcountNav() {
-    return (
-      <Stack.Navigator initialRouteName="QuanLiTK">
-        <Stack.Screen
-          name="QuanLiTK"
-          component={QuanLiTK}
-          options={{ headerShown: false }}
-        />
-        <Stack.Screen
-          name="InformationAcount"
-          component={InformationAcount}
-          options={{ title: "Thông tin tài khoản" }}
-        />
-        <Stack.Screen
-          name="InfoShop"
-          component={InfoShop}
-          options={{ title: "Thông tin shop" }}
-        />
-      </Stack.Navigator>
-    );
-  }
-
   const DrawerNavigator = () => {
     return (
       <Drawer.Navigator
@@ -119,8 +73,8 @@ function App() {
           }}
         />
         <Drawer.Screen
-          name="ManagerProductNav"
-          component={ManagerProductNav}
+          name="ListProduct"
+          component={ListProduct}
           options={{
             title: "Quản lý sản phẩm",
             drawerActiveBackgroundColor: "#D3D3D3",
@@ -193,7 +147,7 @@ function App() {
         />
         <Drawer.Screen
           name="Quản lí tài khoản"
-          component={ManagerAcountNav}
+          component={QuanLiTK}
           options={{
             drawerActiveBackgroundColor: "#D3D3D3",
             drawerActiveTintColor: "black",
@@ -213,19 +167,40 @@ function App() {
     );
   };
 
-  const LoginNavigator = () => {
-    return (
-      <Stack.Navigator>
-        <Stack.Screen name="Login" options={{ headerShown: false }}>
-          {(props) => <Login {...props} setIsLogin={setIsLogin} />}
-        </Stack.Screen>
-      </Stack.Navigator>
-    );
-  };
-
   return (
     <NavigationContainer>
-      {isLogin ? <DrawerNavigator /> : <LoginNavigator />}
+      <Stack.Navigator>
+        <Stack.Screen
+          name="Login"
+          component={Login}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="Main"
+          component={DrawerNavigator}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="AddProduct"
+          component={AddProduct}
+          options={{ title: "Thêm sản phẩm" }}
+        />
+        <Stack.Screen
+          name="EditProduct"
+          component={EditProduct}
+          options={{ title: "Sửa sản phẩm" }}
+        />
+        <Stack.Screen
+          name="InformationAcount"
+          component={InformationAcount}
+          options={{ title: "Thông tin tài khoản" }}
+        />
+        <Stack.Screen
+          name="InfoShop"
+          component={InfoShop}
+          options={{ title: "Thông tin shop" }}
+        />
+      </Stack.Navigator>
     </NavigationContainer>
   );
 }

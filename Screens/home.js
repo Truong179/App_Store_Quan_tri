@@ -10,20 +10,20 @@ import {
   RefreshControl,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { API_User } from "../../API/getAPI";
+import { API_User } from "../API/getAPI";
 import axios from "axios";
 
 const listFunctions = [
   {
     name: "Sản phẩm",
-    screen: "ManagerProductNav",
-    image: require("../../Image/product.png"),
+    screen: "ListProduct",
+    image: require("../Image/product.png"),
     color: "green",
   },
   {
     name: "Đơn hàng",
     screen: "Quản lí dơn hàng",
-    image: require("../../Image/order_menu.png"),
+    image: require("../Image/order_menu.png"),
     color: "blue",
   },
 ];
@@ -68,7 +68,7 @@ const Home = ({ navigation }) => {
         <Text style={styles.orderStatusCount}>{count}</Text>
         <Image
           style={styles.orderStatusIcon}
-          source={require("../../Image/next.png")}
+          source={require("../Image/next.png")}
         />
       </View>
     </TouchableOpacity>
@@ -105,21 +105,18 @@ const Home = ({ navigation }) => {
       >
         <View style={styles.header}>
           <View style={styles.logoContainer}>
-            <Image
-              style={styles.logo}
-              source={require("../../Image/logo.png")}
-            />
+            <Image style={styles.logo} source={require("../Image/logo.png")} />
             <Text style={styles.logoText}>IStore</Text>
           </View>
           <Image
             style={styles.notificationIcon}
-            source={require("../../Image/notification.png")}
+            source={require("../Image/notification.png")}
           />
         </View>
         <View style={styles.statistical}>
           <View style={styles.statisticalDay}>
             <View style={styles.statisticalItem}>
-              <Text style={styles.statisticalTitle}>Doanh thu</Text>
+              <Text style={styles.statisticalTitle}>Doanh thu hôm nay</Text>
               <Text style={styles.statisticalValue}>
                 {synthetic.dailyRevenue}
               </Text>
@@ -127,7 +124,7 @@ const Home = ({ navigation }) => {
             <View style={styles.statisticalItem}>
               <Image
                 style={styles.statisticalIcon}
-                source={require("../../Image/statistical.png")}
+                source={require("../Image/statistical.png")}
               />
               <TouchableOpacity
                 onPress={() => {
@@ -138,7 +135,7 @@ const Home = ({ navigation }) => {
                 <Text style={styles.statisticalDetailsText}>Xem chi tiết</Text>
                 <Image
                   style={styles.statisticalDetailsIcon}
-                  source={require("../../Image/next.png")}
+                  source={require("../Image/next.png")}
                 />
               </TouchableOpacity>
             </View>
@@ -167,17 +164,17 @@ const Home = ({ navigation }) => {
 
         <View style={styles.orderProcessingContainer}>
           {renderOrderStatusItem(
-            { label: "Chờ duyệt", image: require("../../Image/handle.png") },
+            { label: "Chờ duyệt", image: require("../Image/handle.png") },
             synthetic?.orderStatusCounts?.orderStatusCounts["Đang vận chuyển"],
             "DonHang"
           )}
           {renderOrderStatusItem(
-            { label: "Đang giao", image: require("../../Image/shiper.png") },
+            { label: "Đang giao", image: require("../Image/shiper.png") },
             synthetic?.orderStatusCounts?.orderStatusCounts["Đang xử lý"],
             "DangGiao"
           )}
           {renderOrderStatusItem(
-            { label: "Đã giao", image: require("../../Image/success.png") },
+            { label: "Đã giao", image: require("../Image/success.png") },
             synthetic?.orderStatusCounts?.orderStatusCounts["Đã giao"],
             "DaGiao"
           )}

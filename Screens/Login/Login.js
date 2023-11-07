@@ -11,7 +11,7 @@ import { API_User } from "../../API/getAPI";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
 
-const Login = (props) => {
+const Login = ({ navigation }) => {
   const [userName, setUserName] = useState("");
   const [passWord, setPassword] = useState("");
   const [errorUserName, setErrorUserName] = useState("");
@@ -26,14 +26,20 @@ const Login = (props) => {
 
     try {
       const res = await axios.post(API_User + "/signIn", {
-        userName,
-        passWord,
-        role: "Shop",
+        email: userName,
+        password: passWord,
       });
-      AsyncStorage.setItem("user", res.data);
-      setError("");
-      console.log(res.data);
-      props.setIsLogin(true);
+
+      if (res.data.error) {
+        setError(res.data.error);
+      } else {
+        if (res.data.role != "User") {
+          AsyncStorage.setItem("user", JSON.stringify(res.data));
+          navigation.replace("Main");
+        } else {
+          console.warn("Tài khoản không có quyền truy cập!");
+        }
+      }
     } catch (error) {
       console.error("Post api:" + error.message);
     }

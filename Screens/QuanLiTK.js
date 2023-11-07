@@ -16,7 +16,7 @@ const QuanLiTK = () => {
           onPress={() => navigateTo("InformationAcount")}
           style={styles.informationAcount}
         >
-          <Image style={styles.icon} source={require("../../Image/user.png")} />
+          <Image style={styles.icon} source={require("../Image/user.png")} />
           <Text style={styles.label}>Thông tin tài khoản</Text>
         </TouchableOpacity>
 
@@ -24,20 +24,17 @@ const QuanLiTK = () => {
           onPress={() => navigateTo("InfoShop")}
           style={styles.informationAcount}
         >
-          <Image style={styles.icon} source={require("../../Image/shop.png")} />
+          <Image style={styles.icon} source={require("../Image/shop.png")} />
           <Text style={styles.label}>Thông tin Shop</Text>
         </TouchableOpacity>
 
         <TouchableOpacity style={styles.informationAcount}>
-          <Image style={styles.icon} source={require("../../Image/pay.png")} />
+          <Image style={styles.icon} source={require("../Image/pay.png")} />
           <Text style={styles.label}>Rút tiền</Text>
         </TouchableOpacity>
 
         <TouchableOpacity style={styles.information2}>
-          <Image
-            style={styles.icon}
-            source={require("../../Image/address.png")}
-          />
+          <Image style={styles.icon} source={require("../Image/address.png")} />
           <Text style={styles.label}>Địa chỉ Shop</Text>
         </TouchableOpacity>
       </View>

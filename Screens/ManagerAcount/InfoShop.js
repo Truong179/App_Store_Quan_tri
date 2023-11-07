@@ -1,3 +1,4 @@
+import React from "react";
 import {
   Image,
   StyleSheet,
@@ -6,86 +7,41 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import React from "react";
 import Colors from "../../src/Colors";
 
 const InfoShop = () => {
   return (
-    <View style={{ flex: 1 }}>
-      <Text
-        style={{
-          marginTop: 30,
-          marginBottom: 20,
-          marginLeft: 10,
-          fontSize: 16,
-          color: Colors.gray,
-        }}
-      >
-        Liên hệ
-      </Text>
-      <View
-        style={{
-          height: 120,
-          width: "100%",
-          backgroundColor: Colors.wwhite,
-          justifyContent: "center",
-        }}
-      >
-        <View style={{ padding: 10 }}>
+    <View style={styles.container}>
+      <Text style={styles.sectionTitle}>Liên hệ</Text>
+      <View style={styles.infoSection}>
+        <View style={styles.infoItem}>
           <Text>IStore</Text>
         </View>
         <Image
-          style={{ width: "100%" }}
+          style={styles.lineImage}
           source={require("../../Image/line.png")}
         />
-        <View style={{ padding: 10 }}>
+        <View style={styles.infoItem}>
           <TextInput value="0978786765" />
         </View>
       </View>
 
-      <Text
-        style={{
-          fontSize: 16,
-          color: Colors.gray,
-          marginTop: 30,
-          marginBottom: 20,
-          marginLeft: 10,
-        }}
-      >
-        Địa chỉ
-      </Text>
-      <View
-        style={{
-          height: 120,
-          width: "100%",
-          backgroundColor: Colors.wwhite,
-          justifyContent: "center",
-        }}
-      >
-        <View style={{ padding: 10 }}>
+      <Text style={styles.sectionTitle}>Địa chỉ</Text>
+      <View style={styles.infoSection}>
+        <View style={styles.infoItem}>
           <TextInput value="Hà Nội, Quận Nam Từ Liêm, Phường Cầu Diễn" />
         </View>
         <Image
-          style={{ width: "100%" }}
+          style={styles.lineImage}
           source={require("../../Image/line.png")}
         />
-        <View style={{ padding: 10 }}>
+        <View style={styles.infoItem}>
           <TextInput value="Ký Túc Xá Mỹ Đình 3, Đường Hàm Nghi" />
         </View>
       </View>
-      <View style={{ alignItems: "center" }}>
-        <TouchableOpacity
-          style={{
-            backgroundColor: Colors.black,
-            borderRadius: 5,
-            height: 38,
-            alignItems: "center",
-            justifyContent: "center",
-            width: 330,
-            marginTop: 50,
-          }}
-        >
-          <Text style={{ color: Colors.wwhite }}>Hoàn thành</Text>
+      <View style={styles.buttonContainer}>
+        <TouchableOpacity style={styles.button}>
+          <Text style={styles.buttonText}>Hoàn thành</Text>
         </TouchableOpacity>
       </View>
     </View>
@@ -94,4 +50,42 @@ const InfoShop = () => {
 
 export default InfoShop;
 
-const styles = StyleSheet.create({});
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+  },
+  sectionTitle: {
+    fontSize: 16,
+    color: Colors.gray,
+    marginTop: 30,
+    marginBottom: 20,
+    marginLeft: 10,
+  },
+  infoSection: {
+    height: 120,
+    width: "100%",
+    backgroundColor: Colors.wwhite,
+    justifyContent: "center",
+  },
+  infoItem: {
+    padding: 10,
+  },
+  lineImage: {
+    width: "100%",
+  },
+  buttonContainer: {
+    alignItems: "center",
+    marginTop: 50,
+  },
+  button: {
+    backgroundColor: Colors.black,
+    borderRadius: 5,
+    height: 38,
+    alignItems: "center",
+    justifyContent: "center",
+    width: 330,
+  },
+  buttonText: {
+    color: Colors.white,
+  },
+});

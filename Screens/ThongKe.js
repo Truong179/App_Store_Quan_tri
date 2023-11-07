@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { StyleSheet, Text, View, FlatList } from "react-native";
 import DropDownPicker from "react-native-dropdown-picker";
-import ChartComponent from "../../compoment/ChartCompoment";
+import ChartComponent from "../compoment/ChartCompoment";
 
 const dataStats = [
   { name: "Sản phẩm", Quantity: 3.23, percent: 3.12 },

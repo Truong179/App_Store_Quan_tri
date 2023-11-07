@@ -11,7 +11,7 @@ import {
   Pressable,
 } from "react-native";
 import axios from "axios";
-import { API_Product, API_Type_Product } from "../../API/getAPI";
+import { API_Product, API_Type_Product } from "../API/getAPI";
 
 const ListProduct = ({ navigation }) => {
   const [dataType, setDataType] = useState([]);
@@ -133,8 +133,8 @@ const ListProduct = ({ navigation }) => {
                         style={styles.hiddenIcon}
                         source={
                           item.hidden
-                            ? require("../../Image/hidden2.png")
-                            : require("../../Image/hidden.png")
+                            ? require("../Image/hidden2.png")
+                            : require("../Image/hidden.png")
                         }
                       />
                     </TouchableOpacity>
@@ -154,7 +154,7 @@ const ListProduct = ({ navigation }) => {
       >
         <Image
           style={styles.addIcon}
-          source={require("../../Image/addProduct.png")}
+          source={require("../Image/addProduct.png")}
         />
       </Pressable>
     </View>
