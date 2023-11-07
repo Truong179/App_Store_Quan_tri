@@ -21,7 +21,7 @@ const QuanLiDH = () => {
       <Tab.Screen
         name="DonHang"
         component={DonHang}
-        options={{ tabBarLabel: "Dơn hàng" }}
+        options={{ tabBarLabel: "Đơn hàng" }}
       />
       <Tab.Screen
         name="DangGiao"

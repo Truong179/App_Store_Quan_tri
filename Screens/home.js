@@ -165,12 +165,12 @@ const Home = ({ navigation }) => {
         <View style={styles.orderProcessingContainer}>
           {renderOrderStatusItem(
             { label: "Chờ duyệt", image: require("../Image/handle.png") },
-            synthetic?.orderStatusCounts?.orderStatusCounts["Đang vận chuyển"],
+            synthetic?.orderStatusCounts?.orderStatusCounts["Đang xử lý"],
             "DonHang"
           )}
           {renderOrderStatusItem(
             { label: "Đang giao", image: require("../Image/shiper.png") },
-            synthetic?.orderStatusCounts?.orderStatusCounts["Đang xử lý"],
+            synthetic?.orderStatusCounts?.orderStatusCounts["Đang vận chuyển"],
             "DangGiao"
           )}
           {renderOrderStatusItem(

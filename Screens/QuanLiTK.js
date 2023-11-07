@@ -1,6 +1,7 @@
 import React from "react";
 import { StyleSheet, Text, View, Image, TouchableOpacity } from "react-native";
 import { useNavigation } from "@react-navigation/native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const QuanLiTK = () => {
   const nav = useNavigation();
@@ -32,14 +33,15 @@ const QuanLiTK = () => {
           <Image style={styles.icon} source={require("../Image/pay.png")} />
           <Text style={styles.label}>Rút tiền</Text>
         </TouchableOpacity>
-
-        <TouchableOpacity style={styles.information2}>
-          <Image style={styles.icon} source={require("../Image/address.png")} />
-          <Text style={styles.label}>Địa chỉ Shop</Text>
-        </TouchableOpacity>
       </View>
 
-      <TouchableOpacity style={styles.logOut}>
+      <TouchableOpacity
+        style={styles.logOut}
+        onPress={() => {
+          AsyncStorage.clear();
+          nav.replace("Login");
+        }}
+      >
         <Text>Đăng xuất</Text>
       </TouchableOpacity>
     </View>

@@ -52,7 +52,7 @@ const styles = StyleSheet.create({
   infoContainer: {
     height: 189,
     width: 330,
-    backgroundColor: Colors.white,
+    backgroundColor: Colors.wwhite,
     marginTop: 50,
     padding: 20,
     borderRadius: 10,

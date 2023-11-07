@@ -29,15 +29,16 @@ const Login = ({ navigation }) => {
         email: userName,
         password: passWord,
       });
-
       if (res.data.error) {
         setError(res.data.error);
       } else {
-        if (res.data.role != "User") {
-          AsyncStorage.setItem("user", JSON.stringify(res.data));
-          navigation.replace("Main");
+        if (res.data.role == "Shop") {
+          AsyncStorage.setItem("_idUser", res.data._id);
+          navigation.navigate("Main", { screen: "Home" });
         } else {
-          console.warn("Tài khoản không có quyền truy cập!");
+          console.warn(
+            "Tài khoản của bạn không thể đăng nhập tại đây\nVui lòng đăng nhập phía khách"
+          );
         }
       }
     } catch (error) {
@@ -82,6 +83,7 @@ const Login = ({ navigation }) => {
               setErrorPassword("Không được bỏ trống password");
             }
           }}
+          secureTextEntry
           style={styles.textInput}
           placeholder="Password"
         />

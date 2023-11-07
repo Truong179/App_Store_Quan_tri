@@ -1,13 +1,33 @@
-import React from "react";
+import axios from "axios";
+import React, { useEffect, useState } from "react";
 import { Text, View, Image, StyleSheet } from "react-native";
+import { API_User_Info } from "../API/getAPI";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const CustomDrawerHeader = () => {
+  const [array, setArray] = useState();
+
+  const getApi = async () => {
+    try {
+      const res = await axios.get(API_User_Info, {
+        params: { accountID: await AsyncStorage.getItem("_idUser") },
+      });
+      setArray(res.data.message);
+    } catch (error) {
+      console.log("Call api: " + error.message);
+    }
+  };
+
+  useEffect(() => {
+    getApi();
+  }, []);
+
   return (
     <View style={styles.container}>
-      <Image style={styles.avatar} source={require("../Image/avatar.png")} />
+      <Image style={styles.avatar} source={{ uri: array?.avatar }} />
       <View style={styles.textContainer}>
-        <Text style={styles.boldText}>Admin</Text>
-        <Text style={styles.whiteText}>Admin@gmail.com</Text>
+        <Text style={styles.boldText}>{array?.fullName}</Text>
+        <Text style={styles.whiteText}>{array?.accountID.email}</Text>
       </View>
     </View>
   );
