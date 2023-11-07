@@ -78,7 +78,7 @@ const QuanLiBlog = () => {
           </View>
         </View>
         <View style={styles.blogActions}>
-          <EditBlog item={item} />
+          <EditBlog getApi={getApi} item={item} />
           <TouchableOpacity onPress={() => deleteApi(item._id)}>
             <Image
               style={styles.deleteIcon}

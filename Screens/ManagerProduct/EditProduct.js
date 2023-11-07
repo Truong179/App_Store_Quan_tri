@@ -46,6 +46,10 @@ const EditProduct = ({ navigation, route }) => {
 
     let formData = new FormData();
     formData.append("name", name);
+    formData.append("price", price);
+    formData.append("description", disription);
+    formData.append("quantity", quantity);
+    formData.append("id_type", value);
 
     let localUri = image.uri;
     let filename = localUri.split("/").pop();
@@ -65,7 +69,7 @@ const EditProduct = ({ navigation, route }) => {
         ToastAndroid.LONG,
         ToastAndroid.BOTTOM
       );
-      navigation.replace("ListProduct");
+      navigation.replace("Main", { screen: "ListProduct" });
     } catch (error) {
       console.log("Put api: " + error.message);
     }

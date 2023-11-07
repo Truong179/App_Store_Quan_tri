@@ -26,7 +26,7 @@ const AddBlog = (props) => {
       mediaType: "photo",
       allowsEditing: true,
     });
-    if (!result.cancelled) {
+    if (!result.canceled) {
       setImage(result.assets[0]);
     }
   };

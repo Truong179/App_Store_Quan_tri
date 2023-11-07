@@ -38,7 +38,7 @@ const DaHuy = () => {
     <View style={styles.itemContainer}>
       <View style={styles.rowContainer}>
         <View style={styles.userInfoContainer}>
-          <Image style={styles.avatar} source={{ uri: item.productId.image }} />
+          <Image style={styles.avatar} source={{ uri: item.userId.avatar }} />
           <Text>{item.userId.fullName}</Text>
         </View>
         <View>
@@ -51,7 +51,7 @@ const DaHuy = () => {
             style={styles.productImage}
             source={{ uri: item.productId.image }}
           />
-          <Text>{item.productId.name}</Text>
+          <Text numberOfLines={2}>{item.productId.name}</Text>
         </View>
         <View>
           <Text>x{item.quantity}</Text>
@@ -108,6 +108,7 @@ const styles = StyleSheet.create({
   },
   productInfoContainer: {
     flexDirection: "row",
+    width: "50%",
   },
   productImage: {
     height: 40,

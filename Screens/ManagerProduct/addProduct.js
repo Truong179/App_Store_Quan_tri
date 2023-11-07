@@ -64,7 +64,7 @@ const AddProduct = ({ navigation, route }) => {
       });
 
       ToastAndroid.show("Thêm sản phẩm thành công", ToastAndroid.SHORT);
-      navigation.replace("ListProduct");
+      navigation.replace("Main", { screen: "ListProduct" });
     } catch (error) {
       console.log("Post api: " + error.message);
     }

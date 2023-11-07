@@ -72,7 +72,7 @@ const DonHang = () => {
         <View style={styles.userContainer}>
           <Image
             style={styles.userImage}
-            source={{ uri: item.productId.image }}
+            source={{ uri: item.userId.avatar }}
           />
           <Text>{item.userId.fullName}</Text>
         </View>
@@ -81,12 +81,15 @@ const DonHang = () => {
         </View>
       </View>
       <View style={styles.productContainer}>
-        <Image
-          style={styles.productImage}
-          source={{ uri: item.productId.image }}
-        />
+        <View style={{ flexDirection: "row", width: "50%" }}>
+          <Image
+            style={styles.productImage}
+            source={{ uri: item.productId.image }}
+          />
+          <Text numberOfLines={2}>{item.productId.name}</Text>
+        </View>
+
         <View>
-          <Text>{item.productId.name}</Text>
           <Text>x{item.quantity}</Text>
           <Text style={{ color: Colors.red }}>${item.productId.price}</Text>
         </View>
