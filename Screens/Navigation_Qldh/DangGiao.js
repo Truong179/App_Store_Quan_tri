@@ -38,30 +38,30 @@ const DangGiao = () => {
     <View style={styles.itemContainer}>
       <View style={styles.rowContainer}>
         <View style={styles.userInfoContainer}>
-          <Image style={styles.avatar} source={{ uri: item.userId.avatar }} />
-          <Text>{item.userId.fullName}</Text>
+          <Image style={styles.avatar} source={{ uri: item?.userId?.avatar }} />
+          <Text>{item?.userId?.fullName}</Text>
         </View>
         <View>
-          <Text style={{ color: Colors.green }}>{item.status}</Text>
+          <Text style={{ color: Colors.green }}>{item?.status}</Text>
         </View>
       </View>
       <View style={styles.rowContainer}>
         <View style={styles.productInfoContainer}>
           <Image
             style={styles.productImage}
-            source={{ uri: item.productId.image }}
+            source={{ uri: item?.productId?.image }}
           />
-          <Text numberOfLines={2}>{item.productId.name}</Text>
+          <Text numberOfLines={2}>{item?.productId?.name}</Text>
         </View>
         <View>
           <Text>x{item.quantity}</Text>
-          <Text style={{ color: Colors.red }}>${item.productId.price}</Text>
+          <Text style={{ color: Colors.red }}>${item?.productId?.price}</Text>
         </View>
       </View>
       <Image source={require("../../src/icons/line.png")} />
       <View style={styles.rowContainer}>
-        <Text>{item.quantity} sản phẩm</Text>
-        <Text>Thành tiền: {item.totalPrice}</Text>
+        <Text>{item?.quantity} sản phẩm</Text>
+        <Text>Thành tiền: {item?.totalPrice}</Text>
       </View>
       <Image source={require("../../src/icons/line.png")} />
     </View>

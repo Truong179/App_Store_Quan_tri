@@ -72,9 +72,9 @@ const DonHang = () => {
         <View style={styles.userContainer}>
           <Image
             style={styles.userImage}
-            source={{ uri: item.userId.avatar }}
+            source={{ uri: item?.userId?.avatar }}
           />
-          <Text>{item.userId.fullName}</Text>
+          <Text>{item?.userId?.fullName}</Text>
         </View>
         <View>
           <Text style={{ color: Colors.green }}>{item.status}</Text>
@@ -84,14 +84,14 @@ const DonHang = () => {
         <View style={{ flexDirection: "row", width: "50%" }}>
           <Image
             style={styles.productImage}
-            source={{ uri: item.productId.image }}
+            source={{ uri: item?.productId?.image }}
           />
-          <Text numberOfLines={2}>{item.productId.name}</Text>
+          <Text numberOfLines={2}>{item?.productId?.name}</Text>
         </View>
 
         <View>
           <Text>x{item.quantity}</Text>
-          <Text style={{ color: Colors.red }}>${item.productId.price}</Text>
+          <Text style={{ color: Colors.red }}>${item?.productId?.price}</Text>
         </View>
       </View>
       <View style={styles.divider}>
@@ -99,7 +99,7 @@ const DonHang = () => {
       </View>
       <View style={styles.totalContainer}>
         <Text>{item.quantity} sản phẩm</Text>
-        <Text>Thành tiền: {item.totalPrice} </Text>
+        <Text>Thành tiền: {item?.totalPrice} </Text>
       </View>
       <View style={styles.divider}>
         <Image source={require("../../src/icons/line.png")} />

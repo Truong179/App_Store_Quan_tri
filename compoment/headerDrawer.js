@@ -27,7 +27,7 @@ const CustomDrawerHeader = () => {
       <Image style={styles.avatar} source={{ uri: array?.avatar }} />
       <View style={styles.textContainer}>
         <Text style={styles.boldText}>{array?.fullName}</Text>
-        <Text style={styles.whiteText}>{array?.accountID.email}</Text>
+        <Text style={styles.whiteText}>{array?.accountID?.email}</Text>
       </View>
     </View>
   );
