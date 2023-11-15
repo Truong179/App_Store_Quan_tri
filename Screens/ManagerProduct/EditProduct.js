@@ -7,10 +7,11 @@ import {
   TextInput,
   TouchableOpacity,
   ToastAndroid,
+  ActivityIndicator,
 } from "react-native";
 import * as ImagePicker from "expo-image-picker";
 import { Dropdown } from "react-native-element-dropdown";
-import { API_Product } from "../../API/getAPI";
+import { API_Product, API_URL } from "../../API/getAPI";
 import axios from "axios";
 
 const EditProduct = ({ navigation, route }) => {
@@ -18,18 +19,19 @@ const EditProduct = ({ navigation, route }) => {
   const [isFocus, setIsFocus] = useState(false);
 
   const [name, setName] = useState(item.name);
-  const [image, setImage] = useState({ uri: item.image });
+  const [image, setImage] = useState({ uri: `${API_URL}${item.image}` });
   const [price, setPrice] = useState(item.price.toString());
   const [disription, setDisription] = useState(item.description);
   const [quantity, setQuantity] = useState(item.quantity.toString());
   const [value, setValue] = useState(item.id_type._id);
+  const [isCheck, setIsCheck] = useState(false);
 
   const pickImageAsync = async () => {
     let result = await ImagePicker.launchImageLibraryAsync({
       mediaType: "photo",
       allowsEditing: true,
     });
-    if (!result.canceled) {
+    if (!result.cancelled) {
       setImage(result.assets[0]);
     }
   };
@@ -43,6 +45,8 @@ const EditProduct = ({ navigation, route }) => {
       );
       return;
     }
+
+    setIsCheck(true);
 
     let formData = new FormData();
     formData.append("name", name);
@@ -69,8 +73,10 @@ const EditProduct = ({ navigation, route }) => {
         ToastAndroid.LONG,
         ToastAndroid.BOTTOM
       );
-      navigation.replace("Main", { screen: "ListProduct" });
+      navigation.navigate("Main", { screen: "ListProduct" });
+      setIsCheck(false);
     } catch (error) {
+      setIsCheck(false);
       console.log("Put api: " + error.message);
     }
   };
@@ -127,8 +133,16 @@ const EditProduct = ({ navigation, route }) => {
           onChangeText={setQuantity}
         />
 
-        <TouchableOpacity style={styles.btn} onPress={() => putApi()}>
-          <Text style={styles.btnText}>Xác nhận</Text>
+        <TouchableOpacity
+          disabled={isCheck}
+          style={styles.btn}
+          onPress={() => putApi()}
+        >
+          {isCheck ? (
+            <ActivityIndicator size={"small"} color={"white"} />
+          ) : (
+            <Text style={styles.btnText}>Xác nhận</Text>
+          )}
         </TouchableOpacity>
       </View>
     </View>
@@ -178,29 +192,29 @@ const styles = StyleSheet.create({
   },
   image: {
     width: "100%",
-    height: 100,
+    height: 150,
     backgroundColor: "white",
     alignItems: "center",
-    paddingHorizontal: 20,
-    flexDirection: "row",
+    justifyContent: "center",
   },
   imagePicker: {
-    width: 80,
-    height: 80,
+    width: 120,
+    height: 120,
     borderRadius: 10,
     justifyContent: "center",
     alignItems: "center",
     backgroundColor: "#999999",
   },
   imagePreview: {
-    width: 80,
-    height: 80,
-    resizeMode: "contain",
+    width: "100%",
+    height: "100%",
+    resizeMode: "cover",
     borderRadius: 10,
   },
   body: {
     flex: 1,
     paddingHorizontal: 20,
+    paddingTop: 20,
   },
   inputContainer: {
     marginTop: 10,
@@ -208,6 +222,7 @@ const styles = StyleSheet.create({
     backgroundColor: "white",
     paddingHorizontal: 20,
     paddingVertical: 10,
+    borderRadius: 10,
   },
   inputHeader: {
     flexDirection: "row",
@@ -227,6 +242,7 @@ const styles = StyleSheet.create({
     backgroundColor: "white",
     paddingHorizontal: 20,
     paddingVertical: 10,
+    borderRadius: 10,
   },
   dropdown: {
     height: 40,

@@ -1,5 +1,5 @@
-import React from "react";
-import { Image } from "react-native";
+import React, { useEffect, useState } from "react";
+import { Image, TouchableOpacity } from "react-native";
 import {
   DrawerItemList,
   createDrawerNavigator,
@@ -10,22 +10,37 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import QuanLiDH from "./Screens/QuanLiDH";
 import ThongKe from "./Screens/ThongKe";
 import QuanLiTK from "./Screens/QuanLiTK";
-import Home from "./Screens/home";
 import CustomDrawerHeader from "./compoment/headerDrawer";
 import ChangePassword from "./Screens/ManagerAcount/ChangePassword";
-import InformationAcount from "./Screens/ManagerAcount/InfoAccount";
+import InfoAccount from "./Screens/ManagerAcount/InfoAccount";
 import QuanLiBlog from "./Screens/QuanLiBlog";
 import ListProduct from "./Screens/QuanLiSp";
 import AddProduct from "./Screens/ManagerProduct/addProduct";
 import EditProduct from "./Screens/ManagerProduct/EditProduct";
 import Login from "./Screens/Login/Login";
 import InfoShop from "./Screens/ManagerAcount/InfoShop";
+import { MaterialIcons } from "@expo/vector-icons";
+import AddAccount from "./Screens/ManagerAcount/AddAccount";
+import Home from "./Screens/Home";
+import BlogDetail from "./Screens/Blog/BlogDetail ";
+import ProductDetail from "./Screens/ManagerProduct/ProductDetail";
+import OrderDetail from "./Screens/Navigation_Qldh/OrderDetail";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const Drawer = createDrawerNavigator();
 const Stack = createNativeStackNavigator();
 
 function App() {
   const DrawerNavigator = () => {
+    const [role, setRole] = useState("");
+
+    useEffect(() => {
+      async function fetchData() {
+        setRole(await AsyncStorage.getItem("role"));
+      }
+
+      fetchData();
+    }, [role]);
     return (
       <Drawer.Navigator
         drawerContent={(props) => (
@@ -109,24 +124,26 @@ function App() {
             ),
           }}
         />
-        <Drawer.Screen
-          name="Thống kê"
-          component={ThongKe}
-          options={{
-            drawerActiveBackgroundColor: "#D3D3D3",
-            drawerActiveTintColor: "black",
-            drawerIcon: ({ focused, size }) => (
-              <Image
-                source={
-                  focused
-                    ? require("./Image/stats_focus.png")
-                    : require("./Image/stats.png")
-                }
-                style={{ height: size, width: size }}
-              />
-            ),
-          }}
-        />
+        {role === "Shop" && (
+          <Drawer.Screen
+            name="Thống kê"
+            component={ThongKe}
+            options={{
+              drawerActiveBackgroundColor: "#D3D3D3",
+              drawerActiveTintColor: "black",
+              drawerIcon: ({ focused, size }) => (
+                <Image
+                  source={
+                    focused
+                      ? require("./Image/stats_focus.png")
+                      : require("./Image/stats.png")
+                  }
+                  style={{ height: size, width: size }}
+                />
+              ),
+            }}
+          />
+        )}
         <Drawer.Screen
           name="Đổi mật khẩu"
           component={ChangePassword}
@@ -181,6 +198,11 @@ function App() {
           options={{ headerShown: false }}
         />
         <Stack.Screen
+          name="ProductDetail"
+          component={ProductDetail}
+          options={{ title: "Thông tin sản phẩm" }}
+        />
+        <Stack.Screen
           name="AddProduct"
           component={AddProduct}
           options={{ title: "Thêm sản phẩm" }}
@@ -191,9 +213,33 @@ function App() {
           options={{ title: "Sửa sản phẩm" }}
         />
         <Stack.Screen
-          name="InformationAcount"
-          component={InformationAcount}
-          options={{ title: "Thông tin tài khoản" }}
+          name="OrderDetail"
+          component={OrderDetail}
+          options={{ title: "Thông tin đơn hàng" }}
+        />
+        <Stack.Screen
+          name="BlogDetail"
+          component={BlogDetail}
+          options={{ title: "Thông tin blog" }}
+        />
+        <Stack.Screen
+          name="InfoAccount"
+          component={InfoAccount}
+          options={({ navigation }) => ({
+            title: "Danh sách tài khoản",
+            headerRight: () => (
+              <TouchableOpacity
+                onPress={() => navigation.navigate("AddAccount")}
+              >
+                <MaterialIcons name="group-add" size={30} color="black" />
+              </TouchableOpacity>
+            ),
+          })}
+        />
+        <Stack.Screen
+          name="AddAccount"
+          component={AddAccount}
+          options={{ title: "Thêm thành viên" }}
         />
         <Stack.Screen
           name="InfoShop"

@@ -4,6 +4,8 @@ import {
   StyleSheet,
   Text,
   View,
+  ActivityIndicator,
+  Alert,
 } from "react-native";
 import React, { useState } from "react";
 import { validataPassWord } from "../../compoment/validate";
@@ -17,13 +19,14 @@ const Login = ({ navigation }) => {
   const [errorUserName, setErrorUserName] = useState("");
   const [errorPassword, setErrorPassword] = useState("");
   const [error, setError] = useState("");
+  const [isCheck, setIsCheck] = useState(false);
 
   const validateLogin = async () => {
     if (!userName || !passWord) {
       setError("Vui lòng nhập đầy đủ thông tin");
       return;
     }
-
+    setIsCheck(true);
     try {
       const res = await axios.post(API_User + "/signIn", {
         email: userName,
@@ -32,16 +35,20 @@ const Login = ({ navigation }) => {
       if (res.data.error) {
         setError(res.data.error);
       } else {
-        if (res.data.role == "Shop") {
-          AsyncStorage.setItem("_idUser", res.data._id);
-          navigation.navigate("Main", { screen: "Home" });
-        } else {
-          console.warn(
-            "Tài khoản của bạn không thể đăng nhập tại đây\nVui lòng đăng nhập phía khách"
+        if (res.data.role === "User") {
+          Alert.alert(
+            "Thông báo",
+            "Tài khoản của bạn không thể đăng nhập tại đây. Vui lòng đăng nhập phía khách!"
           );
+        } else {
+          AsyncStorage.setItem("_idUser", res.data._id);
+          AsyncStorage.setItem("role", res.data.role);
+          navigation.replace("Main", { screen: "Home" });
         }
       }
+      setIsCheck(false);
     } catch (error) {
+      setIsCheck(false);
       console.error("Post api:" + error.message);
     }
   };
@@ -59,11 +66,11 @@ const Login = ({ navigation }) => {
               setUserName(text);
               setErrorUserName("");
             } else {
-              setErrorUserName("Không được bỏ trống user name");
+              setErrorUserName("Không được bỏ trống email");
             }
           }}
           style={styles.textInput}
-          placeholder="User name"
+          placeholder="Email"
         />
         {errorUserName && (
           <Text style={{ color: "red", marginTop: 5, marginStart: 10 }}>
@@ -96,12 +103,17 @@ const Login = ({ navigation }) => {
         {error && <Text style={{ color: "red", marginTop: 20 }}>{error}</Text>}
 
         <TouchableOpacity
+          disabled={isCheck}
           onPress={() => {
             validateLogin();
           }}
           style={styles.btnLogin}
         >
-          <Text style={{ color: "white" }}>Đăng nhập</Text>
+          {isCheck ? (
+            <ActivityIndicator size={"small"} color={"white"} />
+          ) : (
+            <Text style={{ color: "white" }}>Đăng nhập</Text>
+          )}
         </TouchableOpacity>
       </View>
     </View>

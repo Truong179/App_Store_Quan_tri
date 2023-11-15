@@ -9,18 +9,22 @@ import {
   Text,
   StyleSheet,
   ToastAndroid,
+  ActivityIndicator,
 } from "react-native";
 
 const ChangePassword = ({ navigation }) => {
   const [oldPassword, setOldPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [error, setError] = useState("");
+  const [isCheck, setIsCheck] = useState(false);
 
   const handleChangePassword = async () => {
     if (!oldPassword || !newPassword) {
       setError("Vui lòng nhập đủ các trường dữ liệu");
       return;
     }
+
+    setIsCheck(true);
 
     try {
       const res = await axios.put(
@@ -36,25 +40,39 @@ const ChangePassword = ({ navigation }) => {
       } else {
         setError(res.data.message);
       }
+      setIsCheck(false);
     } catch (error) {
+      setIsCheck(false);
       console.error("Put api: " + error.message);
     }
   };
+
   return (
     <View style={styles.container}>
+      <Text style={styles.title}>Thay Đổi Mật Khẩu</Text>
       <TextInput
         style={styles.input}
         onChangeText={setOldPassword}
-        placeholder="Mật khẩu mới"
+        placeholder="Mật khẩu cũ"
+        secureTextEntry={true}
       />
       <TextInput
         style={styles.input}
         onChangeText={setNewPassword}
-        placeholder="Xác nhận mật khẩu"
+        placeholder="Mật khẩu mới"
+        secureTextEntry={true}
       />
-      {error && <Text style={{ color: "red" }}>{error}</Text>}
-      <TouchableOpacity style={styles.button} onPress={handleChangePassword}>
-        <Text style={styles.buttonText}>Xác nhận</Text>
+      {error && <Text style={styles.errorText}>{error}</Text>}
+      <TouchableOpacity
+        disabled={isCheck}
+        style={styles.button}
+        onPress={handleChangePassword}
+      >
+        {isCheck ? (
+          <ActivityIndicator size={"small"} color={"white"} />
+        ) : (
+          <Text style={styles.buttonText}>Xác Nhận</Text>
+        )}
       </TouchableOpacity>
     </View>
   );
@@ -63,24 +81,44 @@ const ChangePassword = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    paddingHorizontal: 20,
-  },
-  input: {
-    borderBottomWidth: 1,
-    height: 40,
-    marginTop: 50,
-  },
-  button: {
-    width: "100%",
-    backgroundColor: "black",
-    height: 40,
     justifyContent: "center",
     alignItems: "center",
-    borderRadius: 10,
-    marginTop: 40,
+    paddingHorizontal: 20,
+  },
+  title: {
+    fontSize: 24,
+    fontWeight: "bold",
+    marginBottom: 20,
+  },
+  input: {
+    borderWidth: 1,
+    borderRadius: 8,
+    borderColor: "#ccc",
+    height: 40,
+    width: "100%",
+    marginTop: 10,
+    marginBottom: 10,
+    fontSize: 16,
+    paddingHorizontal: 8,
+  },
+  button: {
+    backgroundColor: "black",
+    borderRadius: 8,
+    height: 40,
+    width: "100%",
+    justifyContent: "center",
+    alignItems: "center",
+    marginTop: 20,
   },
   buttonText: {
     color: "white",
+    fontSize: 18,
+    fontWeight: "bold",
+  },
+  errorText: {
+    color: "red",
+    marginBottom: 10,
+    fontSize: 14,
   },
 });
 

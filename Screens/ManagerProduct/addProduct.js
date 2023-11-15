@@ -7,6 +7,7 @@ import {
   TextInput,
   TouchableOpacity,
   ToastAndroid,
+  ActivityIndicator,
 } from "react-native";
 import * as ImagePicker from "expo-image-picker";
 import { Dropdown } from "react-native-element-dropdown";
@@ -23,6 +24,7 @@ const AddProduct = ({ navigation, route }) => {
   const [disription, setDisription] = useState("");
   const [quantity, setQuantity] = useState(0);
   const [value, setValue] = useState(null);
+  const [isCheck, setIsCheck] = useState(false);
 
   const pickImageAsync = async () => {
     let result = await ImagePicker.launchImageLibraryAsync({
@@ -42,6 +44,8 @@ const AddProduct = ({ navigation, route }) => {
       );
       return;
     }
+
+    setIsCheck(true);
 
     let formData = new FormData();
     formData.append("name", name);
@@ -64,8 +68,10 @@ const AddProduct = ({ navigation, route }) => {
       });
 
       ToastAndroid.show("Thêm sản phẩm thành công", ToastAndroid.SHORT);
-      navigation.replace("Main", { screen: "ListProduct" });
+      navigation.goBack();
+      setIsCheck(false);
     } catch (error) {
+      setIsCheck(false);
       console.log("Post api: " + error.message);
     }
   };
@@ -125,8 +131,16 @@ const AddProduct = ({ navigation, route }) => {
           onChangeText={setQuantity}
         />
 
-        <TouchableOpacity style={styles.btn} onPress={() => postApi()}>
-          <Text style={styles.btnText}>Xác nhận</Text>
+        <TouchableOpacity
+          disabled={isCheck}
+          style={styles.btn}
+          onPress={() => postApi()}
+        >
+          {isCheck ? (
+            <ActivityIndicator size={"small"} color={"white"} />
+          ) : (
+            <Text style={styles.btnText}>Xác nhận</Text>
+          )}
         </TouchableOpacity>
       </View>
     </View>
@@ -176,24 +190,23 @@ const styles = StyleSheet.create({
   },
   image: {
     width: "100%",
-    height: 100,
+    height: 150,
     backgroundColor: "white",
     alignItems: "center",
-    paddingHorizontal: 20,
-    flexDirection: "row",
+    justifyContent: "center",
   },
   imagePicker: {
-    width: 80,
-    height: 80,
+    width: 120,
+    height: 120,
     borderRadius: 10,
     justifyContent: "center",
     alignItems: "center",
     backgroundColor: "#999999",
   },
   imagePreview: {
-    width: 80,
-    height: 80,
-    resizeMode: "contain",
+    width: "100%",
+    height: "100%",
+    resizeMode: "cover",
     borderRadius: 10,
   },
   imageText: {
@@ -202,6 +215,7 @@ const styles = StyleSheet.create({
   body: {
     flex: 1,
     paddingHorizontal: 20,
+    paddingTop: 20,
   },
   inputContainer: {
     marginTop: 10,
@@ -209,6 +223,7 @@ const styles = StyleSheet.create({
     backgroundColor: "white",
     paddingHorizontal: 20,
     paddingVertical: 10,
+    borderRadius: 10,
   },
   inputHeader: {
     flexDirection: "row",
@@ -228,6 +243,7 @@ const styles = StyleSheet.create({
     backgroundColor: "white",
     paddingHorizontal: 20,
     paddingVertical: 10,
+    borderRadius: 10,
   },
   dropdown: {
     height: 40,

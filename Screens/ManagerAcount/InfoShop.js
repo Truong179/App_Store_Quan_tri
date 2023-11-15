@@ -7,9 +7,10 @@ import {
   TextInput,
   TouchableOpacity,
   ToastAndroid,
+  ActivityIndicator,
 } from "react-native";
 import * as ImagePicker from "expo-image-picker";
-import { API_User_Info } from "../../API/getAPI";
+import { API_URL, API_User_Info } from "../../API/getAPI";
 import axios from "axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
@@ -20,6 +21,8 @@ const InfoShop = ({ navigation }) => {
   const [address, setAddress] = useState("");
   const [birthday, setBirthday] = useState("");
   const [phoneNumber, setPhoneNumber] = useState("");
+  const [isCheck, setIsCheck] = useState(false);
+  const [role, setRole] = useState("");
 
   const pickImageAsync = async () => {
     let result = await ImagePicker.launchImageLibraryAsync({
@@ -37,11 +40,12 @@ const InfoShop = ({ navigation }) => {
       return;
     }
 
+    setIsCheck(true);
     let formData = new FormData();
     formData.append("fullName", fullName);
     formData.append("address", address);
     formData.append("birthday", birthday);
-    formData.append("phoneNumber", phoneNumber);
+    formData.append("phone", phoneNumber);
 
     let localUri = avatar.uri;
     let filename = localUri.split("/").pop();
@@ -57,8 +61,10 @@ const InfoShop = ({ navigation }) => {
       });
 
       ToastAndroid.show("Lưu thông tin thành công", ToastAndroid.SHORT);
-      navigation.replace("Main", { screen: "Home" });
+      navigation.replace("Main");
+      setIsCheck(false);
     } catch (error) {
+      setIsCheck(false);
       console.log("Post api: " + error.message);
     }
   };
@@ -69,11 +75,11 @@ const InfoShop = ({ navigation }) => {
         params: { accountID: await AsyncStorage.getItem("_idUser") },
       });
       setIdInfo(res.data.message._id);
-      setAvatar({ uri: res.data.message?.avatar });
+      setAvatar({ uri: `${API_URL}${res.data.message?.avatar}` });
       setFullName(res.data.message?.fullName);
       setAddress(res.data.message?.address);
       setBirthday(res.data.message?.birthday);
-      setPhoneNumber(res.data.message?.phone.toString());
+      setPhoneNumber(res.data.message?.phone);
     } catch (error) {
       console.error("Call api: " + error.message);
     }
@@ -81,11 +87,16 @@ const InfoShop = ({ navigation }) => {
 
   useEffect(() => {
     getApi();
-  }, []);
+    async function fetchData() {
+      setRole(await AsyncStorage.getItem("role"));
+    }
+
+    fetchData();
+  }, [role]);
 
   return (
     <View style={styles.container}>
-      <View style={styles.image}>
+      <View style={styles.imageContainer}>
         <TouchableOpacity
           style={styles.imagePicker}
           onPress={() => pickImageAsync()}
@@ -100,31 +111,38 @@ const InfoShop = ({ navigation }) => {
 
       <View style={styles.body}>
         <InputField
-          label="Tên shop"
+          label={role === "Shop" ? "Tên shop" : "Họ tên"}
           value={fullName}
           maxLength={30}
           onChangeText={(text) => setFullName(text)}
         />
         <InputField
-          label="Địa chỉ shop"
-          value={address}
+          label={role === "Shop" ? "Địa chỉ shop" : "Địa chỉ"}
+          value={address ? address : ""}
           maxLength={200}
           onChangeText={(text) => setAddress(text)}
         />
         <InputField
-          label="Ngày thành lập"
-          value={birthday}
+          label={role === "Shop" ? "Ngày thành lập" : "Ngày sinh"}
+          value={birthday ? birthday : ""}
           maxLength={10}
           onChangeText={(text) => setBirthday(text)}
         />
         <NumericInput
           label="Số điện thoại"
-          value={phoneNumber}
+          value={phoneNumber ? phoneNumber : ""}
           onChangeText={setPhoneNumber}
         />
-
-        <TouchableOpacity style={styles.btn} onPress={() => handleUpdate()}>
-          <Text style={styles.btnText}>Xác nhận</Text>
+        <TouchableOpacity
+          disabled={isCheck}
+          style={styles.btn}
+          onPress={() => handleUpdate()}
+        >
+          {isCheck ? (
+            <ActivityIndicator size={"small"} color={"white"} />
+          ) : (
+            <Text style={styles.btnText}>Cập nhật</Text>
+          )}
         </TouchableOpacity>
       </View>
     </View>
@@ -138,7 +156,7 @@ const InputField = ({ label, value, maxLength, onChangeText }) => {
         <Text style={styles.inputLabel}>{label}</Text>
         <Text
           style={styles.inputCounter}
-        >{`${value.length}/${maxLength}`}</Text>
+        >{`${value?.length}/${maxLength}`}</Text>
       </View>
       <TextInput
         maxLength={maxLength}
@@ -171,28 +189,30 @@ const NumericInput = ({ label, value, onChangeText }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: "#f8f8f8",
   },
-  image: {
+  imageContainer: {
     width: "100%",
-    height: 100,
+    height: 150,
     backgroundColor: "white",
     alignItems: "center",
-    paddingHorizontal: 20,
-    flexDirection: "row",
+    justifyContent: "center",
+    borderBottomWidth: 1,
+    borderColor: "#ddd",
   },
   imagePicker: {
-    width: 80,
-    height: 80,
-    borderRadius: 10,
+    width: 100,
+    height: 100,
+    borderRadius: 50,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "#999999",
+    backgroundColor: "gray",
   },
   imagePreview: {
-    width: 80,
-    height: 80,
-    resizeMode: "contain",
-    borderRadius: 10,
+    width: 100,
+    height: 100,
+    resizeMode: "cover",
+    borderRadius: 50,
   },
   imageText: {
     color: "white",
@@ -200,56 +220,38 @@ const styles = StyleSheet.create({
   body: {
     flex: 1,
     paddingHorizontal: 20,
+    paddingTop: 20,
   },
   inputContainer: {
     marginTop: 10,
-    height: 70,
     backgroundColor: "white",
     paddingHorizontal: 20,
-    paddingVertical: 10,
+    paddingVertical: 15,
+    borderRadius: 8,
   },
   inputHeader: {
     flexDirection: "row",
     justifyContent: "space-between",
+    marginBottom: 8,
   },
   inputLabel: {
     fontSize: 16,
+    color: "#555",
   },
   inputCounter: {
-    color: "gray",
+    color: "#888",
   },
   input: {
-    marginTop: 4,
-  },
-  dropdownContainer: {
-    marginTop: 10,
-    backgroundColor: "white",
-    paddingHorizontal: 20,
-    paddingVertical: 10,
-  },
-  dropdown: {
-    height: 40,
-    borderColor: "gray",
-    borderWidth: 0.5,
-    borderRadius: 8,
-    paddingHorizontal: 8,
-    width: 100,
-  },
-  dropdownPlaceholder: {
-    fontSize: 13,
-  },
-  dropdownSelectedText: {
-    fontSize: 13,
-  },
-  dropdownFocus: {
-    borderColor: "blue",
+    borderBottomWidth: 1,
+    borderColor: "#ddd",
+    fontSize: 16,
   },
   btn: {
     width: "100%",
     height: 40,
     backgroundColor: "black",
-    marginTop: 35,
-    borderRadius: 10,
+    marginTop: 20,
+    borderRadius: 8,
     justifyContent: "center",
     alignItems: "center",
   },

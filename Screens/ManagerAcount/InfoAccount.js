@@ -1,103 +1,259 @@
-import React from "react";
-import { StyleSheet, Text, View, Image, TouchableOpacity } from "react-native";
-import { useIsFocused, useNavigation } from "@react-navigation/native";
-import Colors from "../../src/Colors";
+import axios from "axios";
+import React, { useCallback, useEffect, useState } from "react";
+import { View, FlatList, StyleSheet, Modal, Alert } from "react-native";
+import {
+  SearchBar,
+  ListItem,
+  Avatar,
+  Text,
+  Button,
+} from "react-native-elements";
+import { API_URL, API_User, API_User_Info } from "../../API/getAPI";
+import { useFocusEffect } from "@react-navigation/native";
 
-const InformationAcount = (props) => {
-  const nav = useNavigation();
-  const status = useIsFocused();
-  if (status) {
-    nav.setOptions({});
-  }
+const InfoAccount = () => {
+  const [searchText, setSearchText] = useState("");
+  const [employeeList, setEmployeeList] = useState([]);
+  const [originalEmployeeList, setOriginalEmployeeList] = useState([]);
+  const [selectedEmployee, setSelectedEmployee] = useState(null);
+  const [modalVisible, setModalVisible] = useState(false);
+
+  const getApi = async () => {
+    try {
+      const res = await axios.get(`${API_User_Info}all`);
+      setEmployeeList(res.data.message);
+      setOriginalEmployeeList(res.data.message);
+    } catch (error) {
+      console.log("Call api: ", error.message);
+    }
+  };
+
+  useFocusEffect(
+    useCallback(() => {
+      getApi();
+    }, [])
+  );
+
+  useEffect(() => {
+    getApi();
+  }, []);
+
+  const renderEmployeeItem = ({ item }) => (
+    <ListItem
+      bottomDivider
+      onPress={() => {
+        setSelectedEmployee(item);
+        setModalVisible(true);
+      }}
+    >
+      <Avatar
+        size={70}
+        rounded
+        source={{
+          uri: item.avatar
+            ? `${API_URL}${item.avatar}`
+            : "https://th.bing.com/th?id=OIF.VrD%2bB9aSlPX%2b8pXlVwXk7g&w=183&h=181&c=7&r=0&o=5&pid=1.7",
+        }}
+      />
+      <ListItem.Content>
+        <ListItem.Title style={styles.title}>{item.fullName}</ListItem.Title>
+        <ListItem.Subtitle>Email: {item.accountID.email}</ListItem.Subtitle>
+        <ListItem.Subtitle
+          style={styles.subtitle}
+        >{`Vai trò: ${item.accountID.role}`}</ListItem.Subtitle>
+      </ListItem.Content>
+      <ListItem.Chevron />
+    </ListItem>
+  );
+
+  const filterEmployees = (text) => {
+    setSearchText(text);
+    if (text === "") {
+      setEmployeeList(originalEmployeeList);
+    } else {
+      const filteredList = originalEmployeeList.filter((employee) =>
+        employee.fullName.toLowerCase().includes(text.toLowerCase())
+      );
+      setEmployeeList(filteredList);
+    }
+  };
+
+  const handleEditRole = async (role) => {
+    // Hiển thị cảnh báo xác nhận trước khi sửa vai trò
+    Alert.alert(
+      "Xác nhận",
+      `Bạn có chắc muốn đổi vai trò này thành ${
+        role === "User" ? "Staff" : "User"
+      } không?`,
+      [
+        {
+          text: "Hủy bỏ",
+          style: "cancel",
+        },
+        {
+          text: "Xác nhận",
+          onPress: async () => {
+            try {
+              await axios.put(`${API_User}${selectedEmployee.accountID._id}`, {
+                role: role === "User" ? "Staff" : "User",
+              });
+              setModalVisible(false);
+              getApi(); // Làm mới danh sách sau khi chỉnh sửa vai trò
+            } catch (error) {
+              console.log("Error editing role: ", error.message);
+            }
+          },
+        },
+      ]
+    );
+  };
 
   return (
     <View style={styles.container}>
-      <View style={styles.infoContainer}>
-        <View style={styles.infoItem}>
-          <Text style={styles.textTitle}>Email</Text>
-          <Text style={styles.textItem}>vanhung@gmail.com</Text>
-        </View>
-        <Image
-          style={styles.lineImage}
-          source={require("../../Image/line.png")}
-        />
-        <View style={styles.infoItem}>
-          <Text style={styles.textTitle}>Số điện thoại</Text>
-          <Text style={styles.textItem}>098787890</Text>
-        </View>
-      </View>
+      <SearchBar
+        placeholder="Tìm kiếm nhân viên"
+        onChangeText={(text) => filterEmployees(text)}
+        value={searchText}
+        platform="ios"
+        loadingProps={true}
+        containerStyle={styles.searchBarContainer}
+      />
+      <FlatList
+        data={employeeList}
+        renderItem={renderEmployeeItem}
+        keyExtractor={(item) => item._id}
+      />
 
-      <TouchableOpacity style={styles.changePasswordButton}>
-        <Text style={styles.changePasswordText}>Đổi mật khẩu</Text>
-        <Image
-          style={styles.nextImage}
-          source={require("../../Image/next.png")}
-        />
-      </TouchableOpacity>
-
-      <TouchableOpacity style={styles.saveButton}>
-        <Text style={styles.saveButtonText}>Lưu</Text>
-      </TouchableOpacity>
+      <Modal animationType="slide" transparent={true} visible={modalVisible}>
+        <View style={styles.modalContainer}>
+          <View style={styles.modalContent}>
+            {selectedEmployee && (
+              <>
+                <View style={styles.headerContainer}>
+                  <Avatar
+                    size={100}
+                    rounded
+                    source={{
+                      uri: selectedEmployee.avatar
+                        ? `${API_URL}${selectedEmployee.avatar}`
+                        : "https://th.bing.com/th?id=OIF.VrD%2bB9aSlPX%2b8pXlVwXk7g&w=183&h=181&c=7&r=0&o=5&pid=1.7",
+                    }}
+                  />
+                  <Text h4 style={styles.employeeName}>
+                    {selectedEmployee.fullName}
+                  </Text>
+                  <Text style={styles.employeeEmail}>
+                    {selectedEmployee.accountID.email}
+                  </Text>
+                </View>
+                <View style={styles.infoContainer}>
+                  <Text style={styles.infoText}>
+                    Số điện thoại: {selectedEmployee.phone || "N/A"}
+                  </Text>
+                  <Text style={styles.infoText}>
+                    Địa chỉ: {selectedEmployee.address || "N/A"}
+                  </Text>
+                  <Text style={styles.infoText}>
+                    Ngày sinh: {selectedEmployee.birthday || "N/A"}
+                  </Text>
+                  <Text style={styles.infoText}>
+                    Vai trò: {selectedEmployee.accountID.role}
+                  </Text>
+                </View>
+                <View style={styles.buttonContainer}>
+                  <Button
+                    title="Đổi vai trò"
+                    onPress={() =>
+                      handleEditRole(selectedEmployee.accountID.role)
+                    }
+                    buttonStyle={styles.editButton}
+                    titleStyle={styles.buttonTitle}
+                  />
+                  <Button
+                    title="Đóng"
+                    onPress={() => setModalVisible(false)}
+                    buttonStyle={styles.closeButton}
+                    titleStyle={styles.buttonTitle}
+                  />
+                </View>
+              </>
+            )}
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 };
 
-export default InformationAcount;
-
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    alignItems: "center",
+    backgroundColor: "#f0f0f0",
   },
-  infoContainer: {
-    height: 189,
-    width: 330,
-    backgroundColor: Colors.wwhite,
-    marginTop: 50,
-    padding: 20,
-    borderRadius: 10,
+  searchBarContainer: {
+    paddingBottom: 8,
+    padding: "4%",
   },
-  infoItem: {
-    marginBottom: 10,
-  },
-  textTitle: {
-    fontSize: 18,
-    marginBottom: 5,
-  },
-  textItem: {
-    color: Colors.gray,
-    fontSize: 16,
-  },
-  lineImage: {
-    marginTop: 9,
-  },
-  changePasswordButton: {
-    backgroundColor: Colors.white,
-    width: 330,
-    height: 55,
-    marginTop: 50,
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    padding: 10,
-    borderRadius: 10,
-  },
-  changePasswordText: {
+  title: {
     fontWeight: "bold",
-    fontSize: 16,
+    fontSize: 18,
+    color: "#333",
   },
-  nextImage: {
-    height: 20,
-    width: 20,
+  subtitle: {
+    color: "#666",
   },
-  saveButton: {
-    width: 330,
+  modalContainer: {
+    flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    height: 40,
-    marginTop: 100,
-    borderWidth: 1,
+  },
+  modalContent: {
+    backgroundColor: "#fff",
+    padding: 20,
+    borderRadius: 10,
+    elevation: 5,
+  },
+  headerContainer: {
+    alignItems: "center",
+    marginBottom: 20,
+  },
+  employeeName: {
+    marginTop: 10,
+    fontWeight: "bold",
+    fontSize: 20,
+    color: "#333",
+  },
+  employeeEmail: {
+    color: "#666",
+  },
+  infoContainer: {
+    marginBottom: 20,
+  },
+  infoText: {
+    marginBottom: 10,
+    fontSize: 16,
+    color: "#333",
+  },
+  buttonContainer: {
+    flexDirection: "row",
+    justifyContent: "space-around",
+  },
+  editButton: {
+    backgroundColor: "#4CAF50",
+    paddingHorizontal: 20,
+    paddingVertical: 10,
     borderRadius: 5,
   },
-  saveButtonText: {},
+  closeButton: {
+    backgroundColor: "black",
+    paddingHorizontal: 20,
+    paddingVertical: 10,
+    borderRadius: 5,
+  },
+  buttonTitle: {
+    fontSize: 16,
+    color: "#fff",
+  },
 });
+
+export default InfoAccount;

@@ -4,19 +4,19 @@ import DropDownPicker from "react-native-dropdown-picker";
 import ChartComponent from "../compoment/ChartCompoment";
 
 const dataStats = [
-  { name: "Sản phẩm", Quantity: 3.23, percent: 3.12 },
-  { name: "Khách hàng", Quantity: 13.23, percent: 8.12 },
-  { name: "Sản phẩm đã bán", Quantity: 30.23, percent: 10.23 },
+  { name: "Sản phẩm", quantity: 3.23, percent: 3.12 },
+  { name: "Khách hàng", quantity: 13.23, percent: 8.12 },
+  { name: "Sản phẩm đã bán", quantity: 30.23, percent: 10.23 },
 ];
 
 const ThongKe = () => {
   const [open, setOpen] = useState(false);
-  const [value, setValue] = useState(null);
+  const [value, setValue] = useState(1);
   const [items, setItems] = useState([
     { label: "Hôm nay", value: 1 },
     { label: "Hôm qua", value: 2 },
     { label: "Tuần trước", value: 3 },
-    { label: "Tuần trước", value: 4 },
+    { label: "Tháng trước", value: 4 },
   ]);
 
   const CustomNumber = (number) => {
@@ -25,22 +25,12 @@ const ThongKe = () => {
 
   const renderStatsItem = ({ item }) => (
     <View style={styles.stats}>
-      <Text numberOfLines={1} ellipsizeMode="tail" style={{ fontSize: 17 }}>
+      <Text numberOfLines={1} ellipsizeMode="tail" style={styles.statsName}>
         {item.name}
       </Text>
-      <View
-        style={{
-          marginTop: 10,
-          flexDirection: "row",
-          justifyContent: "space-between",
-        }}
-      >
-        <Text style={{ fontWeight: "bold", fontSize: 18 }}>
-          {CustomNumber(item.Quantity)}k
-        </Text>
-        <Text style={{ color: "green", fontSize: 18 }}>
-          {CustomNumber(item.percent)}%
-        </Text>
+      <View style={styles.statsDetails}>
+        <Text style={styles.statsValue}>{CustomNumber(item.quantity)}k</Text>
+        <Text style={styles.statsPercent}>{CustomNumber(item.percent)}%</Text>
       </View>
     </View>
   );
@@ -85,12 +75,12 @@ const ThongKe = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    marginHorizontal: "2%",
+    marginHorizontal: 10,
+    marginTop: 20,
   },
   turnover: {
     height: 100,
     backgroundColor: "white",
-    marginTop: 20,
     borderRadius: 10,
     alignItems: "center",
     flexDirection: "row",
@@ -98,10 +88,11 @@ const styles = StyleSheet.create({
   },
   turnoverInfo: {
     alignItems: "center",
-    marginHorizontal: "2%",
+    marginHorizontal: 10,
   },
   turnoverLabel: {
     fontSize: 18,
+    color: "#333",
   },
   turnoverValue: {
     fontSize: 18,
@@ -109,13 +100,13 @@ const styles = StyleSheet.create({
     marginTop: 5,
   },
   dropdownContainer: {
-    marginHorizontal: "2%",
+    marginHorizontal: 10,
   },
   dropdown: {
     width: 120,
   },
   statsContainer: {
-    marginTop: 25,
+    marginTop: 20,
     zIndex: -1,
   },
   stats: {
@@ -125,18 +116,38 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     padding: 10,
     marginRight: 10,
+    elevation: 2,
+  },
+  statsName: {
+    fontSize: 16,
+    color: "#333",
+  },
+  statsDetails: {
+    marginTop: 5,
+    flexDirection: "row",
+    justifyContent: "space-between",
+  },
+  statsValue: {
+    fontSize: 16,
+    fontWeight: "bold",
+  },
+  statsPercent: {
+    fontSize: 16,
+    color: "green",
   },
   chartContainer: {
     marginTop: 20,
     backgroundColor: "white",
     borderRadius: 10,
     zIndex: -1,
+    padding: 15,
   },
   chartTitle: {
     fontWeight: "bold",
     marginVertical: 10,
     fontSize: 18,
     textAlign: "center",
+    color: "#333",
   },
 });
 

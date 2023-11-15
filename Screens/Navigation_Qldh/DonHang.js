@@ -1,36 +1,40 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import {
   FlatList,
   Image,
-  RefreshControl,
   Text,
   TouchableOpacity,
   View,
   StyleSheet,
   ToastAndroid,
+  Pressable,
 } from "react-native";
 import axios from "axios";
-import { API_User_Pay } from "../../API/getAPI";
+import { API_URL, API_User_Pay } from "../../API/getAPI";
 import Colors from "../../src/Colors";
+import { useFocusEffect } from "@react-navigation/native";
 
 const USER_ROLE = "Shop";
 
-const DonHang = () => {
-  const [refreshing, setRefreshing] = useState(false);
+const DonHang = ({ navigation }) => {
   const [donhang, setDonHang] = useState([]);
 
   useEffect(() => {
     fetchData();
   }, []);
 
+  useFocusEffect(
+    useCallback(() => {
+      fetchData();
+    }, [])
+  );
+
   const fetchData = async () => {
-    setRefreshing(true);
     try {
       const res = await axios.get(API_User_Pay, {
         params: { role: USER_ROLE },
       });
       setDonHang(res.data.message["Đang xử lý"]);
-      setRefreshing(false);
     } catch (error) {
       console.error("Call API: " + error.message);
     }
@@ -66,13 +70,23 @@ const DonHang = () => {
     }
   };
 
+  const formatCurrency = (value) => {
+    return new Intl.NumberFormat("vi-VN", {
+      style: "currency",
+      currency: "VND",
+    }).format(value);
+  };
+
   const renderDonHang = ({ item }) => (
-    <View style={styles.container}>
+    <Pressable
+      onPress={() => navigation.navigate("OrderDetail", { order: item })}
+      style={styles.container}
+    >
       <View style={styles.infoContainer}>
         <View style={styles.userContainer}>
           <Image
             style={styles.userImage}
-            source={{ uri: item?.userId?.avatar }}
+            source={{ uri: `${API_URL}${item?.userId?.avatar}` }}
           />
           <Text>{item?.userId?.fullName}</Text>
         </View>
@@ -84,14 +98,16 @@ const DonHang = () => {
         <View style={{ flexDirection: "row", width: "50%" }}>
           <Image
             style={styles.productImage}
-            source={{ uri: item?.productId?.image }}
+            source={{ uri: `${API_URL}${item?.productId?.image}` }}
           />
           <Text numberOfLines={2}>{item?.productId?.name}</Text>
         </View>
 
         <View>
           <Text>x{item.quantity}</Text>
-          <Text style={{ color: Colors.red }}>${item?.productId?.price}</Text>
+          <Text style={{ color: Colors.red }}>
+            {formatCurrency(item?.productId?.price)}
+          </Text>
         </View>
       </View>
       <View style={styles.divider}>
@@ -99,7 +115,7 @@ const DonHang = () => {
       </View>
       <View style={styles.totalContainer}>
         <Text>{item.quantity} sản phẩm</Text>
-        <Text>Thành tiền: {item?.totalPrice} </Text>
+        <Text>Thành tiền: {formatCurrency(item?.totalPrice)} </Text>
       </View>
       <View style={styles.divider}>
         <Image source={require("../../src/icons/line.png")} />
@@ -112,15 +128,12 @@ const DonHang = () => {
           <Text style={{ color: Colors.wwhite }}>Duyệt</Text>
         </TouchableOpacity>
       </View>
-    </View>
+    </Pressable>
   );
 
   return (
     <View style={styles.screen}>
       <FlatList
-        refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={fetchData} />
-        }
         data={donhang}
         keyExtractor={(item) => item._id}
         renderItem={renderDonHang}
@@ -185,9 +198,9 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.black,
     borderRadius: 5,
     height: 38,
+    width: "70%",
     alignItems: "center",
     justifyContent: "center",
-    width: 117,
   },
 });
 

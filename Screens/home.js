@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import {
   StyleSheet,
   Text,
@@ -7,11 +7,13 @@ import {
   FlatList,
   TouchableOpacity,
   ScrollView,
-  RefreshControl,
+  Alert,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { API_User } from "../API/getAPI";
 import axios from "axios";
+import { useFocusEffect } from "@react-navigation/native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const listFunctions = [
   {
@@ -29,19 +31,28 @@ const listFunctions = [
 ];
 
 const Home = ({ navigation }) => {
-  const [refreshing, setRefreshing] = useState(false);
   const [synthetic, setSynthetic] = useState([]);
+  const [role, setRole] = useState("");
 
   useEffect(() => {
-    fetchData();
-  }, []);
+    getApi();
+    async function fetchData() {
+      setRole(await AsyncStorage.getItem("role"));
+    }
 
-  const fetchData = async () => {
-    setRefreshing(true);
+    fetchData();
+  }, [role]);
+
+  useFocusEffect(
+    useCallback(() => {
+      getApi();
+    }, [])
+  );
+
+  const getApi = async () => {
     try {
       const res = await axios.get(`${API_User}synthetic`);
       setSynthetic(res.data.message);
-      setRefreshing(false);
     } catch (error) {
       console.error("Call API: " + error.message);
     }
@@ -95,14 +106,7 @@ const Home = ({ navigation }) => {
 
   return (
     <SafeAreaView style={styles.container}>
-      <ScrollView
-        refreshControl={
-          <RefreshControl
-            refreshing={refreshing}
-            onRefresh={() => fetchData()}
-          />
-        }
-      >
+      <ScrollView>
         <View style={styles.header}>
           <View style={styles.logoContainer}>
             <Image style={styles.logo} source={require("../Image/logo.png")} />
@@ -128,7 +132,12 @@ const Home = ({ navigation }) => {
               />
               <TouchableOpacity
                 onPress={() => {
-                  navigation.navigate("Thống kê");
+                  if (role != "Shop") {
+                    Alert.alert(
+                      "Thông báo",
+                      "Chỉ có quản trị mới xem được nội dung này!"
+                    );
+                  } else navigation.navigate("Thống kê");
                 }}
                 style={styles.statisticalDetails}
               >

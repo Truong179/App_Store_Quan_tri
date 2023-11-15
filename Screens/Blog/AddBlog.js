@@ -8,6 +8,7 @@ import {
   TextInput,
   TouchableOpacity,
   ToastAndroid,
+  ActivityIndicator,
 } from "react-native";
 import * as ImagePicker from "expo-image-picker";
 import axios from "axios";
@@ -20,6 +21,7 @@ const AddBlog = (props) => {
   const [title, setTitle] = useState("");
   const [image, setImage] = useState("");
   const [desc, setDesc] = useState("");
+  const [isCheck, setIscheck] = useState(false);
 
   const pickImageAsync = async () => {
     let result = await ImagePicker.launchImageLibraryAsync({
@@ -40,6 +42,8 @@ const AddBlog = (props) => {
       );
       return;
     }
+
+    setIscheck(true);
 
     let formData = new FormData();
     formData.append("title", title);
@@ -65,71 +69,81 @@ const AddBlog = (props) => {
       );
       setImage("");
       getApi();
+      setIscheck(false);
       setshowDialog(false);
     } catch (error) {
+      setIscheck(false);
       console.log("Post api: " + error.message);
     }
   };
 
   return (
     <View>
-      <View>
-        <Modal
-          visible={showDialog}
-          transparent={true}
-          animationType="fade"
-          onRequestClose={() => setshowDialog(false)}
-        >
-          <View style={styles.container}>
+      <Modal
+        visible={showDialog}
+        transparent={true}
+        animationType="fade"
+        onRequestClose={() => setshowDialog(false)}
+      >
+        <View style={styles.container}>
+          <TouchableOpacity
+            style={styles.andialog}
+            onPress={() => setshowDialog(false)}
+          >
+            <Text style={styles.closeText}>X</Text>
+          </TouchableOpacity>
+          <Text style={styles.modalTitle}>Add blog</Text>
+          <View style={styles.inputContainer}>
+            <Text style={styles.title}>Tiêu đề</Text>
+            <TextInput
+              placeholder="Tiêu đề"
+              style={styles.input}
+              onChangeText={setTitle}
+            />
+            <Text style={styles.title}>Nội dung</Text>
+            <TextInput
+              placeholder="Nội dung bài viết"
+              style={styles.input}
+              onChangeText={setDesc}
+              multiline={true}
+              numberOfLines={4}
+            />
+            <Text style={styles.title}>Ảnh</Text>
             <TouchableOpacity
-              style={styles.andialog}
-              onPress={() => setshowDialog(false)}
+              style={styles.imageContainer}
+              onPress={() => pickImageAsync()}
             >
-              <Text style={styles.closeText}>X</Text>
-            </TouchableOpacity>
-            <Text style={styles.modalTitle}>Add blog</Text>
-            <View style={styles.inputContainer}>
-              <Text style={styles.title}>Tiêu đề</Text>
-              <TextInput
-                placeholder="Tiêu đề"
-                style={styles.input}
-                onChangeText={setTitle}
-              />
-              <Text style={styles.title}>Nội dung</Text>
-              <TextInput
-                placeholder="Nội dung bài viết"
-                style={styles.input}
-                onChangeText={setDesc}
-              />
-              <Text style={styles.title}>Ảnh</Text>
-              <TouchableOpacity
-                style={styles.imageContainer}
-                onPress={() => pickImageAsync()}
-              >
-                {image ? (
-                  <Image style={styles.image} source={{ uri: image.uri }} />
-                ) : (
-                  <Text style={styles.imageText}>Chọn ảnh</Text>
-                )}
-              </TouchableOpacity>
-            </View>
-            <TouchableOpacity
-              style={styles.saveButton}
-              onPress={() => postApi()}
-            >
-              <Text style={styles.saveButtonText}>Save</Text>
+              {image ? (
+                <Image style={styles.image} source={{ uri: image.uri }} />
+              ) : (
+                <Text style={styles.imageText}>Chọn ảnh</Text>
+              )}
             </TouchableOpacity>
           </View>
-        </Modal>
-        <TouchableOpacity onPress={() => setshowDialog(true)}>
-          <Image
-            style={styles.icon}
-            source={{
-              uri: "https://cdn-icons-png.flaticon.com/512/262/262038.png",
-            }}
-          />
-        </TouchableOpacity>
-      </View>
+          <TouchableOpacity
+            disabled={isCheck}
+            style={styles.saveButton}
+            onPress={() => postApi()}
+          >
+            {isCheck ? (
+              <ActivityIndicator size={"small"} color={"white"} />
+            ) : (
+              <Text style={styles.saveButtonText}>Save</Text>
+            )}
+          </TouchableOpacity>
+        </View>
+      </Modal>
+      <TouchableOpacity
+        style={{ marginBottom: "2%" }}
+        onPress={() => setshowDialog(true)}
+      >
+        <Image
+          style={styles.icon}
+          source={{
+            uri: "https://cdn-icons-png.flaticon.com/512/262/262038.png",
+          }}
+        />
+      </TouchableOpacity>
     </View>
   );
 };
@@ -159,6 +173,7 @@ const styles = StyleSheet.create({
     alignSelf: "center",
     height: "80%",
     elevation: 2,
+    padding: 20,
   },
   modalTitle: {
     textAlign: "center",
@@ -168,7 +183,7 @@ const styles = StyleSheet.create({
     color: Colors.black,
   },
   inputContainer: {
-    margin: 10,
+    marginVertical: 10,
   },
   title: {
     fontSize: 17,
@@ -177,11 +192,15 @@ const styles = StyleSheet.create({
   input: {
     fontSize: 16,
     height: 50,
-    margin: 10,
+    marginVertical: 10,
+    borderColor: Colors.grey,
+    borderWidth: 1,
+    borderRadius: 5,
+    paddingLeft: 10,
   },
   imageContainer: {
-    width: 200,
-    height: 200,
+    width: "100%",
+    aspectRatio: 16 / 9,
     borderRadius: 10,
     backgroundColor: Colors.gray,
     alignSelf: "center",
@@ -189,8 +208,8 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   image: {
-    width: 200,
-    height: 200,
+    width: "100%",
+    height: "100%",
     resizeMode: "contain",
     borderRadius: 10,
   },
@@ -200,13 +219,13 @@ const styles = StyleSheet.create({
   },
   saveButton: {
     backgroundColor: Colors.black,
-    width: 100,
+    width: "40%",
     height: 40,
     justifyContent: "center",
     alignItems: "center",
     borderRadius: 10,
     alignSelf: "flex-end",
-    margin: 10,
+    marginTop: 10,
   },
   saveButtonText: {
     color: Colors.wwhite,

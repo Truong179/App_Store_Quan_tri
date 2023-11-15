@@ -1,4 +1,5 @@
 import {
+  ActivityIndicator,
   Image,
   Modal,
   StyleSheet,
@@ -12,14 +13,14 @@ import React, { useState } from "react";
 import Colors from "../../src/Colors";
 import * as ImagePicker from "expo-image-picker";
 import axios from "axios";
-import { API_Blog } from "../../API/getAPI";
+import { API_Blog, API_URL } from "../../API/getAPI";
 
-const EditBlog = (props) => {
-  const { getApi, item } = props;
+const EditBlog = ({ getApi, item }) => {
   const [showDialog, setshowDialog] = useState(false);
-  const [title, setTitle] = useState(props.item.title);
-  const [desc, setDesc] = useState(props.item.desc);
-  const [image, setImage] = useState({ uri: props.item.image });
+  const [title, setTitle] = useState(item.title);
+  const [desc, setDesc] = useState(item.desc);
+  const [image, setImage] = useState({ uri: `${API_URL}${item.image}` });
+  const [isCheck, setIsCheck] = useState(false);
 
   const pickImageAsync = async () => {
     let result = await ImagePicker.launchImageLibraryAsync({
@@ -41,6 +42,8 @@ const EditBlog = (props) => {
       return;
     }
 
+    setIsCheck(true);
+
     let formData = new FormData();
     formData.append("title", title);
     formData.append("desc", desc);
@@ -49,7 +52,7 @@ const EditBlog = (props) => {
     let filename = localUri.split("/").pop();
     let match = /\.(\w+)$/.exec(filename);
     let type = match ? `image/${match[1]}` : `image`;
-    formData.append("image", { uri: image.uri, name: filename, type });
+    formData.append("image", { uri: localUri, name: filename, type });
 
     try {
       await axios.put(API_Blog + item._id, formData, {
@@ -64,8 +67,10 @@ const EditBlog = (props) => {
         ToastAndroid.BOTTOM
       );
       getApi();
+      setIsCheck(false);
       setshowDialog(false);
     } catch (error) {
+      setIsCheck(false);
       console.log("Put api: " + error.message);
     }
   };
@@ -113,8 +118,16 @@ const EditBlog = (props) => {
               )}
             </TouchableOpacity>
           </View>
-          <TouchableOpacity style={styles.saveButton} onPress={() => putApi()}>
-            <Text style={styles.saveText}>Save</Text>
+          <TouchableOpacity
+            disabled={isCheck}
+            style={styles.saveButton}
+            onPress={() => putApi()}
+          >
+            {isCheck ? (
+              <ActivityIndicator size={"small"} color={"white"} />
+            ) : (
+              <Text style={styles.saveText}>Save</Text>
+            )}
           </TouchableOpacity>
         </View>
       </Modal>
@@ -168,7 +181,11 @@ const styles = StyleSheet.create({
   input: {
     fontSize: 16,
     height: 50,
-    margin: 10,
+    marginVertical: 10,
+    borderColor: Colors.grey,
+    borderWidth: 1,
+    borderRadius: 5,
+    paddingLeft: 10,
   },
   imagePicker: {
     width: 200,

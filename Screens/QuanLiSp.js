@@ -3,7 +3,6 @@ import {
   FlatList,
   Image,
   RefreshControl,
-  ScrollView,
   StyleSheet,
   Text,
   View,
@@ -11,26 +10,26 @@ import {
   Pressable,
 } from "react-native";
 import axios from "axios";
-import { API_Product, API_Type_Product } from "../API/getAPI";
+import { API_Product, API_Type_Product, API_URL } from "../API/getAPI";
+import { useFocusEffect } from "@react-navigation/native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const ListProduct = ({ navigation }) => {
   const [dataType, setDataType] = useState([]);
   const [dataProduct, setProduct] = useState([]);
-  const [refreshing, setRefreshing] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState("Macbook");
+  const [role, setRole] = useState("");
 
   const formatPrice = (price) => {
     return Intl.NumberFormat("vi-VN").format(price);
   };
 
   const getApi = async () => {
-    setRefreshing(true);
     try {
       const res1 = await axios.get(API_Product, { params: { role: "Shop" } });
       setProduct(res1.data.message);
       const res2 = await axios.get(API_Type_Product);
       setDataType(res2.data.message);
-      setRefreshing(false);
     } catch (error) {
       console.log("Call api: " + error.message);
     }
@@ -39,11 +38,11 @@ const ListProduct = ({ navigation }) => {
   const putHidden = async (item) => {
     let formData = new FormData();
 
-    let localUri = item.image;
+    let localUri = `${API_URL}${item.image}`;
     let filename = localUri.split("/").pop();
     let match = /\.(\w+)$/.exec(filename);
     let type = match ? `image/${match[1]}` : `image`;
-    formData.append("image", { uri: item.image, name: filename, type });
+    formData.append("image", { uri: localUri, name: filename, type });
     formData.append("hidden", !item.hidden);
 
     try {
@@ -58,13 +57,20 @@ const ListProduct = ({ navigation }) => {
     }
   };
 
-  const onRefresh = useCallback(() => {
-    getApi();
-  }, []);
+  useFocusEffect(
+    useCallback(() => {
+      getApi();
+    }, [])
+  );
 
   useEffect(() => {
     getApi();
-  }, []);
+    async function fetchData() {
+      setRole(await AsyncStorage.getItem("role"));
+    }
+
+    fetchData();
+  }, [role]);
 
   return (
     <View style={styles.container}>
@@ -82,7 +88,7 @@ const ListProduct = ({ navigation }) => {
               >
                 <Image
                   style={styles.typeProductImage}
-                  source={{ uri: item.image }}
+                  source={{ uri: `${API_URL}${item.image}` }}
                 />
                 <Text style={styles.typeProductName}>{item.name}</Text>
               </TouchableOpacity>
@@ -90,73 +96,69 @@ const ListProduct = ({ navigation }) => {
           }}
         />
       </View>
-
-      <ScrollView
-        refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-        }
-        contentContainerStyle={styles.container}
-      >
-        <FlatList
-          scrollEnabled={false}
-          data={dataProduct[selectedCategory]}
-          numColumns={2}
-          keyExtractor={(key) => key._id}
-          renderItem={({ item }) => {
-            return (
-              <Pressable
-                style={styles.btnProduct}
-                onPress={() => {
-                  navigation.navigate("EditProduct", {
-                    item: item,
-                    dataType: dataType,
-                  });
-                }}
-              >
-                <Image
-                  style={styles.productImage}
-                  source={{ uri: item.image }}
-                />
-                <View style={styles.productInfoContainer}>
-                  <Text style={styles.productName} numberOfLines={1}>
-                    {item.name}
+      <FlatList
+        data={dataProduct[selectedCategory]}
+        numColumns={2}
+        keyExtractor={(key) => key._id}
+        renderItem={({ item }) => {
+          return (
+            <Pressable
+              style={styles.btnProduct}
+              onPress={() => {
+                navigation.navigate("ProductDetail", {
+                  product: item,
+                  dataType: dataType,
+                  role,
+                });
+              }}
+            >
+              <Image
+                style={styles.productImage}
+                source={{ uri: `${API_URL}${item.image}` }}
+              />
+              <View style={styles.productInfoContainer}>
+                <Text style={styles.productName} numberOfLines={1}>
+                  {item.name}
+                </Text>
+                <Text style={styles.productQuantity} numberOfLines={2}>
+                  Còn: {item.quantity}
+                </Text>
+                <View style={styles.productPriceContainer}>
+                  <Text style={styles.productPrice}>
+                    {formatPrice(item.price)}đ
                   </Text>
-                  <Text style={styles.productQuantity} numberOfLines={2}>
-                    Còn: {item.quantity}
-                  </Text>
-                  <View style={styles.productPriceContainer}>
-                    <Text style={styles.productPrice}>
-                      {formatPrice(item.price)}đ
-                    </Text>
-                    <TouchableOpacity onPress={() => putHidden(item)}>
-                      <Image
-                        style={styles.hiddenIcon}
-                        source={
-                          item.hidden
-                            ? require("../Image/hidden2.png")
-                            : require("../Image/hidden.png")
-                        }
-                      />
-                    </TouchableOpacity>
-                  </View>
+                  <TouchableOpacity onPress={() => putHidden(item)}>
+                    <Image
+                      style={styles.hiddenIcon}
+                      source={
+                        item.hidden
+                          ? require("../Image/hidden2.png")
+                          : require("../Image/hidden.png")
+                      }
+                    />
+                  </TouchableOpacity>
                 </View>
-              </Pressable>
-            );
-          }}
-        />
-      </ScrollView>
-
-      <Pressable
-        onPress={() => {
-          navigation.navigate("AddProduct", { dataType: dataType });
+              </View>
+            </Pressable>
+          );
         }}
-        style={styles.addButton}
-      >
-        <Image
-          style={styles.addIcon}
-          source={require("../Image/addProduct.png")}
-        />
-      </Pressable>
+      />
+
+      {role === "Shop" && (
+        <Pressable
+          onPress={() => {
+            navigation.navigate("AddProduct", {
+              dataType: dataType,
+            });
+          }}
+          style={styles.addButton}
+        >
+          <Image
+            style={styles.addIcon}
+            source={require("../Image/addProduct.png")}
+          />
+        </Pressable>
+      )}
     </View>
   );
 };
@@ -167,10 +169,9 @@ const styles = StyleSheet.create({
   },
   headerType: {
     marginTop: "1%",
-    width: "100%",
-    height: "13%",
+    padding: "2%",
     backgroundColor: "white",
-    paddingHorizontal: "1%",
+    borderRadius: 10,
   },
   typeProduct: {
     width: 150,
@@ -186,7 +187,7 @@ const styles = StyleSheet.create({
   },
   typeProductName: {
     position: "absolute",
-    fontSize: 20,
+    fontSize: 18,
     color: "white",
     fontWeight: "bold",
     bottom: 10,
@@ -199,7 +200,8 @@ const styles = StyleSheet.create({
     backgroundColor: "white",
     padding: "2%",
     margin: "1%",
-    borderRadius: 10,
+    borderRadius: 15,
+    elevation: 5,
   },
   productImage: {
     width: "95%",
