@@ -5,13 +5,7 @@ import axios from "axios";
 import { useNavigation } from "@react-navigation/native";
 import { API_User_Pay, API_URL } from "../../API/getAPI";
 import Colors from "../../src/Colors";
-
-const formatCurrency = (value) => {
-  return new Intl.NumberFormat("vi-VN", {
-    style: "currency",
-    currency: "VND",
-  }).format(value);
-};
+import { formatCurrency } from "../Home";
 
 const OrderDetail = ({ route }) => {
   const { order } = route.params;

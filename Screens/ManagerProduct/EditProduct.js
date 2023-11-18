@@ -13,6 +13,7 @@ import * as ImagePicker from "expo-image-picker";
 import { Dropdown } from "react-native-element-dropdown";
 import { API_Product, API_URL } from "../../API/getAPI";
 import axios from "axios";
+import { formatCurrency } from "../Home";
 
 const EditProduct = ({ navigation, route }) => {
   const { dataType, item } = route.params;

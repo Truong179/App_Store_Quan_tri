@@ -1,5 +1,4 @@
-import axios from "axios";
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useState } from "react";
 import { View, FlatList, StyleSheet, Modal, Alert } from "react-native";
 import {
   SearchBar,
@@ -10,6 +9,7 @@ import {
 } from "react-native-elements";
 import { API_URL, API_User, API_User_Info } from "../../API/getAPI";
 import { useFocusEffect } from "@react-navigation/native";
+import axios from "axios";
 
 const InfoAccount = () => {
   const [searchText, setSearchText] = useState("");
@@ -34,10 +34,6 @@ const InfoAccount = () => {
     }, [])
   );
 
-  useEffect(() => {
-    getApi();
-  }, []);
-
   const renderEmployeeItem = ({ item }) => (
     <ListItem
       bottomDivider
@@ -50,17 +46,17 @@ const InfoAccount = () => {
         size={70}
         rounded
         source={{
-          uri: item.avatar
-            ? `${API_URL}${item.avatar}`
+          uri: item?.avatar
+            ? `${API_URL}${item?.avatar}`
             : "https://th.bing.com/th?id=OIF.VrD%2bB9aSlPX%2b8pXlVwXk7g&w=183&h=181&c=7&r=0&o=5&pid=1.7",
         }}
       />
       <ListItem.Content>
-        <ListItem.Title style={styles.title}>{item.fullName}</ListItem.Title>
-        <ListItem.Subtitle>Email: {item.accountID.email}</ListItem.Subtitle>
+        <ListItem.Title style={styles.title}>{item?.fullName}</ListItem.Title>
+        <ListItem.Subtitle>Email: {item?.accountID?.email}</ListItem.Subtitle>
         <ListItem.Subtitle
           style={styles.subtitle}
-        >{`Vai trò: ${item.accountID.role}`}</ListItem.Subtitle>
+        >{`Vai trò: ${item?.accountID?.role}`}</ListItem.Subtitle>
       </ListItem.Content>
       <ListItem.Chevron />
     </ListItem>
@@ -72,7 +68,7 @@ const InfoAccount = () => {
       setEmployeeList(originalEmployeeList);
     } else {
       const filteredList = originalEmployeeList.filter((employee) =>
-        employee.fullName.toLowerCase().includes(text.toLowerCase())
+        employee?.fullName.toLowerCase().includes(text.toLowerCase())
       );
       setEmployeeList(filteredList);
     }
@@ -94,9 +90,12 @@ const InfoAccount = () => {
           text: "Xác nhận",
           onPress: async () => {
             try {
-              await axios.put(`${API_User}${selectedEmployee.accountID._id}`, {
-                role: role === "User" ? "Staff" : "User",
-              });
+              await axios.put(
+                `${API_User}${selectedEmployee?.accountID?._id}`,
+                {
+                  role: role === "User" ? "Staff" : "User",
+                }
+              );
               setModalVisible(false);
               getApi(); // Làm mới danh sách sau khi chỉnh sửa vai trò
             } catch (error) {
@@ -121,7 +120,7 @@ const InfoAccount = () => {
       <FlatList
         data={employeeList}
         renderItem={renderEmployeeItem}
-        keyExtractor={(item) => item._id}
+        keyExtractor={(item) => item?._id}
       />
 
       <Modal animationType="slide" transparent={true} visible={modalVisible}>
@@ -134,37 +133,37 @@ const InfoAccount = () => {
                     size={100}
                     rounded
                     source={{
-                      uri: selectedEmployee.avatar
-                        ? `${API_URL}${selectedEmployee.avatar}`
+                      uri: selectedEmployee?.avatar
+                        ? `${API_URL}${selectedEmployee?.avatar}`
                         : "https://th.bing.com/th?id=OIF.VrD%2bB9aSlPX%2b8pXlVwXk7g&w=183&h=181&c=7&r=0&o=5&pid=1.7",
                     }}
                   />
                   <Text h4 style={styles.employeeName}>
-                    {selectedEmployee.fullName}
+                    {selectedEmployee?.fullName}
                   </Text>
                   <Text style={styles.employeeEmail}>
-                    {selectedEmployee.accountID.email}
+                    {selectedEmployee?.accountID?.email}
                   </Text>
                 </View>
                 <View style={styles.infoContainer}>
                   <Text style={styles.infoText}>
-                    Số điện thoại: {selectedEmployee.phone || "N/A"}
+                    Số điện thoại: {selectedEmployee?.phone || "N/A"}
                   </Text>
                   <Text style={styles.infoText}>
-                    Địa chỉ: {selectedEmployee.address || "N/A"}
+                    Địa chỉ: {selectedEmployee?.address || "N/A"}
                   </Text>
                   <Text style={styles.infoText}>
-                    Ngày sinh: {selectedEmployee.birthday || "N/A"}
+                    Ngày sinh: {selectedEmployee?.birthday || "N/A"}
                   </Text>
                   <Text style={styles.infoText}>
-                    Vai trò: {selectedEmployee.accountID.role}
+                    Vai trò: {selectedEmployee?.accountID?.role}
                   </Text>
                 </View>
                 <View style={styles.buttonContainer}>
                   <Button
                     title="Đổi vai trò"
                     onPress={() =>
-                      handleEditRole(selectedEmployee.accountID.role)
+                      handleEditRole(selectedEmployee?.accountID?.role)
                     }
                     buttonStyle={styles.editButton}
                     titleStyle={styles.buttonTitle}

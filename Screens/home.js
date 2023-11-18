@@ -30,22 +30,25 @@ const listFunctions = [
   },
 ];
 
+export const formatCurrency = (value) => {
+  return new Intl.NumberFormat("vi-VN", {
+    style: "currency",
+    currency: "VND",
+  }).format(value);
+};
+
 const Home = ({ navigation }) => {
   const [synthetic, setSynthetic] = useState([]);
   const [role, setRole] = useState("");
 
-  useEffect(() => {
-    getApi();
-    async function fetchData() {
-      setRole(await AsyncStorage.getItem("role"));
-    }
-
-    fetchData();
-  }, [role]);
-
   useFocusEffect(
     useCallback(() => {
       getApi();
+      async function fetchData() {
+        setRole(await AsyncStorage.getItem("role"));
+      }
+
+      fetchData();
     }, [])
   );
 
@@ -122,7 +125,7 @@ const Home = ({ navigation }) => {
             <View style={styles.statisticalItem}>
               <Text style={styles.statisticalTitle}>Doanh thu hôm nay</Text>
               <Text style={styles.statisticalValue}>
-                {synthetic.dailyRevenue}
+                {formatCurrency(synthetic.dailyRevenue)}
               </Text>
             </View>
             <View style={styles.statisticalItem}>

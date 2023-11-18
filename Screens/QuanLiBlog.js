@@ -63,17 +63,13 @@ const QuanLiBlog = ({ navigation }) => {
   useFocusEffect(
     useCallback(() => {
       getApi();
+      async function fetchData() {
+        setRole(await AsyncStorage.getItem("role"));
+      }
+
+      fetchData();
     }, [])
   );
-
-  useEffect(() => {
-    getApi();
-    async function fetchData() {
-      setRole(await AsyncStorage.getItem("role"));
-    }
-
-    fetchData();
-  }, []);
 
   const renderItem = ({ item }) => {
     return (

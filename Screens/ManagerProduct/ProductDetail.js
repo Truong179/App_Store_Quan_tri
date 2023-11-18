@@ -9,6 +9,7 @@ import {
 } from "react-native";
 import Colors from "../../src/Colors";
 import { API_URL } from "../../API/getAPI";
+import { formatCurrency } from "../Home";
 
 const ProductDetail = ({ route, navigation }) => {
   // Lấy dữ liệu sản phẩm từ route.params
@@ -22,9 +23,7 @@ const ProductDetail = ({ route, navigation }) => {
       />
       <View style={styles.contentContainer}>
         <Text style={styles.title}>{product.name}</Text>
-        <Text style={styles.price}>
-          Giá: {Intl.NumberFormat("vi-VN").format(product.price)}đ
-        </Text>
+        <Text style={styles.price}>Giá: {formatCurrency(product.price)}</Text>
         <Text style={styles.quantity}>Số lượng: {product.quantity}</Text>
         <Text style={styles.description}>{product.description}</Text>
       </View>

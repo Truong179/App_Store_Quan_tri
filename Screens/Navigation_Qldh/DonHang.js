@@ -13,15 +13,12 @@ import axios from "axios";
 import { API_URL, API_User_Pay } from "../../API/getAPI";
 import Colors from "../../src/Colors";
 import { useFocusEffect } from "@react-navigation/native";
+import { formatCurrency } from "../Home";
 
 const USER_ROLE = "Shop";
 
 const DonHang = ({ navigation }) => {
   const [donhang, setDonHang] = useState([]);
-
-  useEffect(() => {
-    fetchData();
-  }, []);
 
   useFocusEffect(
     useCallback(() => {
@@ -68,13 +65,6 @@ const DonHang = ({ navigation }) => {
     } catch (error) {
       console.error("Put API: " + error.message);
     }
-  };
-
-  const formatCurrency = (value) => {
-    return new Intl.NumberFormat("vi-VN", {
-      style: "currency",
-      currency: "VND",
-    }).format(value);
   };
 
   const renderDonHang = ({ item }) => (

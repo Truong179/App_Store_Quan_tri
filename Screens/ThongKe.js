@@ -1,7 +1,9 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { StyleSheet, Text, View, FlatList } from "react-native";
 import DropDownPicker from "react-native-dropdown-picker";
 import ChartComponent from "../compoment/ChartCompoment";
+import axios from "axios";
+import { API_URL } from "../API/getAPI";
 
 const dataStats = [
   { name: "Sản phẩm", quantity: 3.23, percent: 3.12 },
@@ -35,6 +37,18 @@ const ThongKe = () => {
     </View>
   );
 
+  const getApi = async () => {
+    try {
+      const res = await axios.get(`${API_URL}`);
+      console.log(res.data);
+    } catch (error) {
+      console.log("Call api: ", error.message);
+    }
+  };
+
+  useEffect(() => {
+    getApi();
+  }, []);
   return (
     <View style={styles.container}>
       <View style={styles.turnover}>

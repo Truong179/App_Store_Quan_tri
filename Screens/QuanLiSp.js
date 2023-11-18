@@ -13,16 +13,13 @@ import axios from "axios";
 import { API_Product, API_Type_Product, API_URL } from "../API/getAPI";
 import { useFocusEffect } from "@react-navigation/native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { formatCurrency } from "./Home";
 
 const ListProduct = ({ navigation }) => {
   const [dataType, setDataType] = useState([]);
   const [dataProduct, setProduct] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState("Macbook");
   const [role, setRole] = useState("");
-
-  const formatPrice = (price) => {
-    return Intl.NumberFormat("vi-VN").format(price);
-  };
 
   const getApi = async () => {
     try {
@@ -60,17 +57,13 @@ const ListProduct = ({ navigation }) => {
   useFocusEffect(
     useCallback(() => {
       getApi();
+      async function fetchData() {
+        setRole(await AsyncStorage.getItem("role"));
+      }
+
+      fetchData();
     }, [])
   );
-
-  useEffect(() => {
-    getApi();
-    async function fetchData() {
-      setRole(await AsyncStorage.getItem("role"));
-    }
-
-    fetchData();
-  }, [role]);
 
   return (
     <View style={styles.container}>
@@ -125,7 +118,7 @@ const ListProduct = ({ navigation }) => {
                 </Text>
                 <View style={styles.productPriceContainer}>
                   <Text style={styles.productPrice}>
-                    {formatPrice(item.price)}đ
+                    {formatCurrency(item.price)}
                   </Text>
                   <TouchableOpacity onPress={() => putHidden(item)}>
                     <Image
